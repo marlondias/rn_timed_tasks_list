@@ -18,7 +18,7 @@ const getEstimatedTimeText = (timeInSeconds: number): string => {
   }
 
   const hoursOnly = Math.floor(timeInSeconds / HOUR_IN_SECONDS)
-  const minutesOnly = Math.floor(timeInSeconds % HOUR_IN_SECONDS) / MINUTE_IN_SECONDS
+  const minutesOnly = Math.floor((timeInSeconds % HOUR_IN_SECONDS) / MINUTE_IN_SECONDS)
   const secondsOnly = timeInSeconds % MINUTE_IN_SECONDS
 
   return [
