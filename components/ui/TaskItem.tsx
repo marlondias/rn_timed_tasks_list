@@ -83,13 +83,14 @@ const styles = StyleSheet.create({
 		paddingVertical: 10,
 	},
 	infoWrapper: {
-		flexGrow: 1,
-		backgroundColor: 'red',
+		flex: 1,
+		flexShrink: 1,
 		flexDirection: 'column',
 		justifyContent: 'space-between',
 	},
 	controlsWrapper: {
-		backgroundColor: 'green',
+		flexShrink: 0,
+		flexWrap: 'nowrap',
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		gap: 15,
