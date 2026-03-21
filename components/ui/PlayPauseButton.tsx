@@ -40,7 +40,7 @@ export function PlayPauseButton({ initialIsPlaying, onPause, onResume }: Props) 
 				<MaterialCommunityIcons
 					name={isPlaying ? 'pause' : 'play'}
 					size={24}
-					color={colorScheme === 'dark' ? 'white' : 'black'}
+					color={isDarkMode ? 'white' : 'black'}
 				/>
 			</View>
 		</TouchableOpacity>

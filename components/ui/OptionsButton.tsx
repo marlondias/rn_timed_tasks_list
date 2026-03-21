@@ -26,7 +26,7 @@ export function OptionsButton({ onPress }: Props) {
 				<MaterialCommunityIcons
 					name="dots-vertical"
 					size={24}
-					color={colorScheme === 'dark' ? 'white' : 'black'}
+					color={isDarkMode ? 'white' : 'black'}
 				/>
 			</View>
 		</TouchableOpacity>
