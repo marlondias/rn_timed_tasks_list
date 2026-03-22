@@ -8,6 +8,12 @@ import { RestartButton } from './RestartButton'
 
 type Props = {
 	task: Task
+	onPressPlay: (taskId: number) => void
+	onPressPause: (taskId: number) => void
+	onPressRestart: (taskId: number) => void
+	onPressEdit: (taskId: number) => void
+	onPressDuplicate: (taskId: number) => void
+	onPressRemove: (taskId: number) => void
 }
 
 const getEstimatedTimeText = (timeInSeconds: number): string => {
@@ -29,7 +35,15 @@ const getEstimatedTimeText = (timeInSeconds: number): string => {
 	].join(' ')
 }
 
-export function TaskItem({ task }: Props) {
+export function TaskItem({
+	task,
+	onPressPlay,
+	onPressPause,
+	onPressRestart,
+	onPressEdit,
+	onPressDuplicate,
+	onPressRemove,
+}: Props) {
 	const isCompleted = !!task.completedAt
 
 	return (
@@ -46,19 +60,19 @@ export function TaskItem({ task }: Props) {
 				</View>
 				<View style={styles.controlsWrapper}>
 					{isCompleted ? (
-						<RestartButton onPress={() => console.log(`RESTART task ID=${task.id}`)} />
+						<RestartButton onPress={() => onPressRestart(task.id)} />
 					) : (
 						<PlayPauseButton
 							initialIsPlaying={task.isRunning}
-							onPause={() => console.log(`PAUSE task ID=${task.id}`)}
-							onResume={() => console.log(`RESUME task ID=${task.id}`)}
+							onPlay={() => onPressPlay(task.id)}
+							onPause={() => onPressPause(task.id)}
 						/>
 					)}
 
 					<OptionsMenu
-						onPressEdit={() => console.log(`EDIT task ID=${task.id}`)}
-						onPressDuplicate={() => console.log(`DUPLICATE task ID=${task.id}`)}
-						onPressRemove={() => console.log(`REMOVE task ID=${task.id}`)}
+						onPressEdit={() => onPressEdit(task.id)}
+						onPressDuplicate={() => onPressDuplicate(task.id)}
+						onPressRemove={() => onPressRemove(task.id)}
 					/>
 				</View>
 			</View>
