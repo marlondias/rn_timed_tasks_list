@@ -1,15 +1,13 @@
 import { Task } from '@/types/Task'
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { OptionsButton } from './OptionsButton'
+import { OptionsMenu } from './OptionsMenu'
 import { PlayPauseButton } from './PlayPauseButton'
 import { ProgressBar } from './ProgressBar'
+import { RestartButton } from './RestartButton'
 
 type Props = {
 	task: Task
-
-	onPaused?: () => boolean
-	onResumed?: () => boolean
 }
 
 const getEstimatedTimeText = (timeInSeconds: number): string => {
@@ -31,7 +29,9 @@ const getEstimatedTimeText = (timeInSeconds: number): string => {
 	].join(' ')
 }
 
-export function TaskItem({ task, ...props }: Props) {
+export function TaskItem({ task }: Props) {
+	const isCompleted = !!task.completedAt
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.content}>
@@ -45,13 +45,20 @@ export function TaskItem({ task, ...props }: Props) {
 					</Text>
 				</View>
 				<View style={styles.controlsWrapper}>
-					<PlayPauseButton
-						initialIsPlaying={task.isRunning}
-						onPause={() => console.log(`PAUSED task ID=${task.id}`)}
-						onResume={() => console.log(`RESUMED task ID=${task.id}`)}
-					/>
-					<OptionsButton
-						onPress={() => console.log(`OPTIONS button pressed for task ID=${task.id}`)}
+					{isCompleted ? (
+						<RestartButton onPress={() => console.log(`RESTART task ID=${task.id}`)} />
+					) : (
+						<PlayPauseButton
+							initialIsPlaying={task.isRunning}
+							onPause={() => console.log(`PAUSE task ID=${task.id}`)}
+							onResume={() => console.log(`RESUME task ID=${task.id}`)}
+						/>
+					)}
+
+					<OptionsMenu
+						onPressEdit={() => console.log(`EDIT task ID=${task.id}`)}
+						onPressDuplicate={() => console.log(`DUPLICATE task ID=${task.id}`)}
+						onPressRemove={() => console.log(`REMOVE task ID=${task.id}`)}
 					/>
 				</View>
 			</View>
