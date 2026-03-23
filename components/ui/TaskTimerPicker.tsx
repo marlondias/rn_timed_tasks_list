@@ -27,15 +27,21 @@ export function TaskTimerPicker({ initialDuration, onChange }: Props) {
 			MaskedView={MaskedView}
 			styles={{
 				theme: isDarkMode ? 'dark' : 'light',
+				backgroundColor: 'transparent',
 				pickerItem: {
 					fontSize: 28,
+					opacity: 0.7,
+				},
+				selectedPickerItem: {
+					opacity: 1,
 				},
 				pickerLabel: {
-					fontSize: 18,
+					fontSize: 20,
 					fontWeight: 'bold',
 				},
+				pickerLabelGap: 6,
 				pickerContainer: {
-					backgroundColor: 'transparent',
+					paddingRight: 18,
 				},
 			}}
 			onDurationChange={(value) => {
