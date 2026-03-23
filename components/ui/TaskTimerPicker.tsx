@@ -1,4 +1,5 @@
 import { TimerDuration } from '@/types/TimerDuration'
+import MaskedView from '@react-native-masked-view/masked-view'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useColorScheme } from 'react-native'
 import { TimerPicker } from 'react-native-timer-picker'
@@ -23,6 +24,7 @@ export function TaskTimerPicker({ initialDuration, onChange }: Props) {
 			minuteLabel="m"
 			secondLabel="s"
 			LinearGradient={LinearGradient}
+			MaskedView={MaskedView}
 			styles={{
 				theme: isDarkMode ? 'dark' : 'light',
 				pickerItem: {
@@ -33,7 +35,7 @@ export function TaskTimerPicker({ initialDuration, onChange }: Props) {
 					fontWeight: 'bold',
 				},
 				pickerContainer: {
-					// backgroundColor: 'transparent',
+					backgroundColor: 'transparent',
 				},
 			}}
 			onDurationChange={(value) => {
