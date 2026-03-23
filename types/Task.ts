@@ -1,7 +1,9 @@
+import { TimerDuration } from './TimerDuration'
+
 export type Task = {
 	id: number
 	title: string
-	timeForCompletionInSeconds: number
+	duration: TimerDuration
 	remainingTimeInSeconds: number
 	isRunning: boolean
 	createdAt: Date

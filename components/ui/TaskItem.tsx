@@ -1,4 +1,5 @@
 import { Task } from '@/types/Task'
+import { TimerDuration } from '@/types/TimerDuration'
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { OptionsMenu } from './OptionsMenu'
@@ -16,10 +17,10 @@ type Props = {
 	onPressRemove: (taskId: number) => void
 }
 
-const getEstimatedTimeText = (timeInSeconds: number): string => {
-	const MINUTE_IN_SECONDS = 60
-	const HOUR_IN_SECONDS = 60 * MINUTE_IN_SECONDS
+const MINUTE_IN_SECONDS = 60
+const HOUR_IN_SECONDS = 60 * MINUTE_IN_SECONDS
 
+const getEstimatedTimeText = (timeInSeconds: number): string => {
 	if (!Number.isFinite(timeInSeconds) || timeInSeconds <= 0) {
 		return '0s'
 	}
@@ -33,6 +34,25 @@ const getEstimatedTimeText = (timeInSeconds: number): string => {
 		minutesOnly > 0 ? `${minutesOnly}m` : '',
 		secondsOnly > 0 ? `${secondsOnly}s` : '0s',
 	].join(' ')
+}
+
+const getEstimatedTimeTextFromDuration = (duration: TimerDuration): string => {
+	return [
+		duration.hours > 0 ? `${duration.hours}h` : '',
+		duration.minutes > 0 ? `${duration.minutes}m` : '',
+		duration.seconds > 0 ? `${duration.seconds}s` : '0s',
+	].join(' ')
+}
+
+const getElapsedTimePercentage = (
+	duration: TimerDuration,
+	remainingTimeInSeconds: number
+): number => {
+	const timeForCompletionInSeconds =
+		duration.hours * HOUR_IN_SECONDS +
+		duration.minutes * MINUTE_IN_SECONDS +
+		duration.seconds
+	return (remainingTimeInSeconds / timeForCompletionInSeconds) * 100
 }
 
 export function TaskItem({
@@ -52,7 +72,7 @@ export function TaskItem({
 				<View style={styles.infoWrapper}>
 					<Text style={styles.titleText}>{task.title}</Text>
 					<Text style={styles.subText}>
-						Estimated time: {getEstimatedTimeText(task.timeForCompletionInSeconds)}
+						Estimated time: {getEstimatedTimeTextFromDuration(task.duration)}
 					</Text>
 					<Text style={styles.subText}>
 						Remaining time: {getEstimatedTimeText(task.remainingTimeInSeconds)}
@@ -77,9 +97,10 @@ export function TaskItem({
 				</View>
 			</View>
 			<ProgressBar
-				currentPercentage={
-					(task.remainingTimeInSeconds / task.timeForCompletionInSeconds) * 100
-				}
+				currentPercentage={getElapsedTimePercentage(
+					task.duration,
+					task.remainingTimeInSeconds
+				)}
 				height={5}
 			/>
 		</View>
