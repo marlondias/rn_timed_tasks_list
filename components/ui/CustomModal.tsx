@@ -93,6 +93,7 @@ const styles = StyleSheet.create({
 		backgroundColor: 'rgba(255,255,255,0.3)',
 	},
 	modal: {
+		width: '80%',
 		borderRadius: 20,
 		padding: 10,
 	},
