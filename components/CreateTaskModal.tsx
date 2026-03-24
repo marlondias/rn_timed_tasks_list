@@ -2,7 +2,7 @@ import { CustomModal } from '@/components/ui/CustomModal'
 import { TaskTimerPicker } from '@/components/ui/TaskTimerPicker'
 import { TaskTitleInput } from '@/components/ui/TaskTitleInput'
 import { TimerDuration } from '@/types/TimerDuration'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { View } from 'react-native'
 
 type Props = {
@@ -18,6 +18,16 @@ export function CreateTaskModal({ isVisible, setIsVisible, onConfirmCreation }: 
 		minutes: 0,
 		seconds: 0,
 	})
+	const isValidForCreation: boolean = useMemo(
+		() => !!title.trim() && duration.hours + duration.minutes + duration.seconds > 0,
+		[title, duration]
+	)
+
+	useEffect(() => {
+		if (isVisible) return
+		setTitle('')
+		setDuration({ hours: 0, minutes: 0, seconds: 0 })
+	}, [isVisible])
 
 	return (
 		<CustomModal
@@ -26,17 +36,24 @@ export function CreateTaskModal({ isVisible, setIsVisible, onConfirmCreation }: 
 			title="Create a task"
 			buttons={[
 				{
+					title: 'Cancel',
+					color: '#b84f4f',
+					onPress: () => setIsVisible(false),
+				},
+				{
 					title: 'Create',
+					color: '#47ad46',
 					onPress: () => {
-						onConfirmCreation(title, duration)
+						if (!isValidForCreation) return
+						onConfirmCreation(title.trim(), duration)
 						setIsVisible(false)
 					},
 				},
 			]}
 		>
 			<View>
-				<TaskTitleInput onChange={setTitle} />
-				<TaskTimerPicker onChange={setDuration} />
+				<TaskTitleInput initialTitle={title} onChange={setTitle} />
+				<TaskTimerPicker initialDuration={duration} onChange={setDuration} />
 			</View>
 		</CustomModal>
 	)
