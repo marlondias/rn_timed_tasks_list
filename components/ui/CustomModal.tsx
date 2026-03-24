@@ -3,7 +3,6 @@ import {
 	Button,
 	ButtonProps,
 	Modal,
-	Pressable,
 	StyleSheet,
 	Text,
 	useColorScheme,
@@ -33,14 +32,13 @@ export function CustomModal({
 			visible={isVisible}
 			onRequestClose={() => setIsVisible(false)}
 		>
-			<Pressable
+			<View
 				style={{
 					...styles.backdrop,
 					...(isDarkMode ? styles.backdropDarkMode : styles.backdropLightMode),
 				}}
-				onPress={() => setIsVisible(false)}
 			>
-				<Pressable
+				<View
 					style={{
 						...styles.modal,
 						...(isDarkMode ? styles.modalDarkMode : styles.modalLightMode),
@@ -74,8 +72,8 @@ export function CustomModal({
 							</View>
 						)}
 					</View>
-				</Pressable>
-			</Pressable>
+				</View>
+			</View>
 		</Modal>
 	)
 }
