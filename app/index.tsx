@@ -1,40 +1,57 @@
+import { CreateTaskModal } from '@/components/CreateTaskModal'
 import { TaskList } from '@/components/TaskList'
+import { AddTaskButton } from '@/components/ui/AddTaskButton'
+import { useTaskStorage } from '@/contexts/TaskStorage/TaskStorageContext'
 import { Task } from '@/types/Task'
-import { StyleSheet } from 'react-native'
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
-
-function getRandomTimeInSeconds(): number {
-	const min = 30
-	const max = 2 * 60 * 60
-	return Math.floor(Math.random() * (max - min + 1)) + min
-}
-
-const mockTasks: Task[] = Array.from({ length: 20 }).map((value, index) => {
-	const completionTime = getRandomTimeInSeconds()
-	const remainingTime = Math.random() * completionTime
-	return {
-		id: 100 + index,
-		title: `Mock task #${index + 1}`,
-		createdAt: new Date(),
-		timeForCompletionInSeconds: completionTime,
-		remainingTimeInSeconds: remainingTime,
-		isRunning: false,
-	}
-})
+import { useCallback, useEffect, useState } from 'react'
+import { StyleSheet, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function Index() {
+	const { taskStorageService } = useTaskStorage()
+	const [tasks, setTasks] = useState<Task[]>([])
+	const [isCreationModalVisible, setIsCreationModalVisible] = useState(false)
+	const updateTasks = useCallback(() => {
+		const storedTasks = taskStorageService.getAll()
+		setTasks(storedTasks)
+	}, [taskStorageService])
+
+	useEffect(() => {
+		updateTasks()
+	}, [updateTasks])
+
 	return (
-		<SafeAreaProvider>
-			<SafeAreaView style={styles.safeContainer}>
-				<TaskList tasks={mockTasks} />
-			</SafeAreaView>
-		</SafeAreaProvider>
+		<SafeAreaView edges={['bottom']} style={styles.safeContainer}>
+			<View style={styles.screenContainer}>
+				<TaskList tasks={tasks} />
+
+				<CreateTaskModal
+					isVisible={isCreationModalVisible}
+					setIsVisible={setIsCreationModalVisible}
+					onConfirmCreation={(title, duration) => {
+						taskStorageService.add(title, duration)
+						updateTasks()
+					}}
+				/>
+
+				<View style={styles.buttonOverlay}>
+					<AddTaskButton onPress={() => setIsCreationModalVisible(true)} />
+				</View>
+			</View>
+		</SafeAreaView>
 	)
 }
 
 const styles = StyleSheet.create({
 	safeContainer: {
 		flex: 1,
-		backgroundColor: '#C6E916',
+	},
+	screenContainer: {
+		flex: 1,
+	},
+	buttonOverlay: {
+		position: 'absolute',
+		right: 30,
+		bottom: 30,
 	},
 })
