@@ -8,6 +8,7 @@ import {
 	useColorScheme,
 	View,
 } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 type Props = {
 	isVisible: boolean
@@ -32,53 +33,58 @@ export function CustomModal({
 			visible={isVisible}
 			onRequestClose={() => setIsVisible(false)}
 		>
-			<View
-				style={{
-					...styles.backdrop,
-					...(isDarkMode ? styles.backdropDarkMode : styles.backdropLightMode),
-				}}
-			>
+			<SafeAreaView edges={['bottom']} style={styles.safeContainer}>
 				<View
 					style={{
-						...styles.modal,
-						...(isDarkMode ? styles.modalDarkMode : styles.modalLightMode),
+						...styles.backdrop,
+						...(isDarkMode ? styles.backdropDarkMode : styles.backdropLightMode),
 					}}
 				>
-					<View style={styles.innerContainer}>
-						{title && (
-							<View style={styles.titleContainer}>
-								<Text
-									style={{
-										...styles.titleText,
-										...(isDarkMode
-											? styles.titleTextDarkMode
-											: styles.titleTextLightMode),
-									}}
-								>
-									{title}
-								</Text>
-							</View>
-						)}
-						{children}
-						{buttons && (
-							<View style={styles.buttonsContainer}>
-								{buttons.map((button, index) => {
-									return (
-										<View key={index} style={styles.button}>
-											<Button {...button} />
-										</View>
-									)
-								})}
-							</View>
-						)}
+					<View
+						style={{
+							...styles.modal,
+							...(isDarkMode ? styles.modalDarkMode : styles.modalLightMode),
+						}}
+					>
+						<View style={styles.innerContainer}>
+							{title && (
+								<View style={styles.titleContainer}>
+									<Text
+										style={{
+											...styles.titleText,
+											...(isDarkMode
+												? styles.titleTextDarkMode
+												: styles.titleTextLightMode),
+										}}
+									>
+										{title}
+									</Text>
+								</View>
+							)}
+							{children}
+							{buttons && (
+								<View style={styles.buttonsContainer}>
+									{buttons.map((button, index) => {
+										return (
+											<View key={index} style={styles.button}>
+												<Button {...button} />
+											</View>
+										)
+									})}
+								</View>
+							)}
+						</View>
 					</View>
 				</View>
-			</View>
+			</SafeAreaView>
 		</Modal>
 	)
 }
 
 const styles = StyleSheet.create({
+	safeContainer: {
+		flex: 1,
+	},
 	backdrop: {
 		flex: 1,
 		justifyContent: 'center',
