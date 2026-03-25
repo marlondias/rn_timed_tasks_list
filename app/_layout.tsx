@@ -1,5 +1,10 @@
-import { Stack } from "expo-router";
+import { TaskStorageProvider } from '@/contexts/TaskStorage/TaskStorageProvider'
+import { Stack } from 'expo-router'
 
 export default function RootLayout() {
-  return <Stack />;
+	return (
+		<TaskStorageProvider>
+			<Stack />
+		</TaskStorageProvider>
+	)
 }
