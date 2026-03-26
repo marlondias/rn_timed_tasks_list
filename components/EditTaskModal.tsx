@@ -28,10 +28,11 @@ export function EditTaskModal({
 	)
 
 	useEffect(() => {
-		if (isVisible) return
-		setTitle(initialTitle)
-		setDuration(initialDuration)
-	}, [initialTitle, initialDuration, isVisible])
+		if (isVisible) {
+			setTitle(initialTitle)
+			setDuration(initialDuration)
+		}
+	}, [isVisible])
 
 	return (
 		<CustomModal
