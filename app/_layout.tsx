@@ -13,7 +13,11 @@ export default function RootLayout() {
 			<SafeAreaProvider>
 				<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
 					<StatusBar style="auto" />
-					<Stack />
+					<Stack
+						screenOptions={{
+							title: 'MultiTasker',
+						}}
+					/>
 				</ThemeProvider>
 			</SafeAreaProvider>
 		</TaskStorageProvider>
