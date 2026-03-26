@@ -1,12 +1,10 @@
 import { TaskItem } from '@/components/ui/TaskItem'
-import { Task } from '@/types/Task'
+import { useTaskStorage } from '@/contexts/TaskStorage/TaskStorageContext'
 import { ScrollView, StyleSheet, View } from 'react-native'
 
-type Props = {
-	tasks: Task[]
-}
+export function TaskList() {
+	const { tasks, taskStorageService } = useTaskStorage()
 
-export function TaskList({ tasks }: Props) {
 	return (
 		<View style={styles.container}>
 			<ScrollView contentContainerStyle={styles.scrollContent}>
@@ -24,13 +22,13 @@ export function TaskList({ tasks }: Props) {
 							console.log(`RESTART task ID=${taskId}`)
 						}}
 						onPressEdit={(taskId) => {
-							console.log(`EDIT task ID=${taskId}`)
+							console.log(`Abrir modal de edição. Task ID=${taskId}`)
 						}}
 						onPressDuplicate={(taskId) => {
-							console.log(`DUPLICATE task ID=${taskId}`)
+							taskStorageService.duplicate(taskId)
 						}}
 						onPressRemove={(taskId) => {
-							console.log(`REMOVE task ID=${taskId}`)
+							taskStorageService.remove(taskId)
 						}}
 					/>
 				))}
