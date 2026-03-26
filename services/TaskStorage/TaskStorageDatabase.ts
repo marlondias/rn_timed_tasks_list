@@ -46,7 +46,7 @@ export class TaskStorageDatabase {
 		)
 	}
 
-	public async updateTask(taskId: number, task: Task): Promise<void> {
+	public async updateTask(task: Task): Promise<void> {
 		await this.db.runAsync(
 			`
 				UPDATE tasks
