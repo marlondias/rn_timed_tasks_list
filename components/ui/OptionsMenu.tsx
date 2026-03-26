@@ -1,7 +1,7 @@
+import { OptionsButton } from '@/components/ui/OptionsButton'
 import { MenuAction, MenuView } from '@react-native-menu/menu'
 import { useCallback } from 'react'
 import { useColorScheme } from 'react-native'
-import { OptionsButton } from './OptionsButton'
 
 type Props = {
 	onMenuOpen?: () => void

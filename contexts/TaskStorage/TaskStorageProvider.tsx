@@ -1,7 +1,7 @@
+import { TaskStorageContext } from '@/contexts/TaskStorage/TaskStorageContext'
 import { TaskStorageService } from '@/services/TaskStorage/TaskStorageService'
 import { Task } from '@/types/Task'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
-import { TaskStorageContext } from './TaskStorageContext'
 
 export function TaskStorageProvider({ children }: PropsWithChildren) {
 	const serviceInstance = useRef(new TaskStorageService())

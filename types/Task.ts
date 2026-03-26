@@ -1,4 +1,4 @@
-import { TimerDuration } from './TimerDuration'
+import { TimerDuration } from '@/types/TimerDuration'
 
 export type Task = {
 	id: number

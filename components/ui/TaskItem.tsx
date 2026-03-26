@@ -1,11 +1,11 @@
+import { OptionsMenu } from '@/components/ui/OptionsMenu'
+import { PlayPauseButton } from '@/components/ui/PlayPauseButton'
+import { ProgressBar } from '@/components/ui/ProgressBar'
+import { RestartButton } from '@/components/ui/RestartButton'
 import { Task } from '@/types/Task'
 import { TimerDuration } from '@/types/TimerDuration'
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { OptionsMenu } from './OptionsMenu'
-import { PlayPauseButton } from './PlayPauseButton'
-import { ProgressBar } from './ProgressBar'
-import { RestartButton } from './RestartButton'
 
 type Props = {
 	task: Task
