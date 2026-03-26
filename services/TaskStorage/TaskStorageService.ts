@@ -5,24 +5,34 @@ class TaskStorageService {
 	private readonly tasks: Map<number, Task> = new Map()
 	private orderedTaskIds: number[] = []
 	private nextId: number = 1
+	public onDataMutation?: () => void
 
 	public add(title: string, duration: TimerDuration): void {
-		const newTask: Task = {
-			title,
-			duration,
-			id: this.getNextId(),
-			createdAt: new Date(),
-			isRunning: false,
-			remainingTimeInSeconds: 0,
-		}
-
+		const newTask = this.getNewTask(title, duration)
 		this.tasks.set(newTask.id, newTask)
 		this.orderedTaskIds.push(newTask.id)
+		this.triggerMutation()
+	}
+
+	public duplicate(taskId: number): void {
+		const existingTask = this.get(taskId)
+		const newTask = this.getNewTask(existingTask.title, existingTask.duration)
+		this.tasks.set(newTask.id, newTask)
+		this.orderedTaskIds.push(newTask.id) //FIXME
+		this.triggerMutation()
+	}
+
+	public modify(taskId: number, title: string, duration: TimerDuration): void {
+		const oldTask = this.get(taskId)
+		const newTask = { ...oldTask, title, duration }
+		this.tasks.set(oldTask.id, newTask)
+		this.triggerMutation()
 	}
 
 	public remove(taskId: number): void {
 		this.tasks.delete(taskId)
 		this.orderedTaskIds = this.orderedTaskIds.filter((id) => id !== taskId)
+		this.triggerMutation()
 	}
 
 	public get(taskId: number): Task {
@@ -37,8 +47,21 @@ class TaskStorageService {
 		return this.orderedTaskIds.map((id) => this.get(id))
 	}
 
-	private getNextId(): number {
-		return this.nextId++
+	private getNewTask(title: string, duration: TimerDuration): Task {
+		return {
+			id: this.nextId++,
+			title,
+			duration,
+			createdAt: new Date(),
+			isRunning: false,
+			remainingTimeInSeconds: 0,
+		}
+	}
+
+	private triggerMutation(): void {
+		if (this.onDataMutation) {
+			this.onDataMutation()
+		}
 	}
 }
 
