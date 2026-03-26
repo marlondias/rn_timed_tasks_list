@@ -22,6 +22,13 @@ class TaskStorageService {
 		this.triggerMutation()
 	}
 
+	public modify(taskId: number, title: string, duration: TimerDuration): void {
+		const oldTask = this.get(taskId)
+		const newTask = { ...oldTask, title, duration }
+		this.tasks.set(oldTask.id, newTask)
+		this.triggerMutation()
+	}
+
 	public remove(taskId: number): void {
 		this.tasks.delete(taskId)
 		this.orderedTaskIds = this.orderedTaskIds.filter((id) => id !== taskId)
