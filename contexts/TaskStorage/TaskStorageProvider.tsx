@@ -12,10 +12,8 @@ export function TaskStorageProvider({ children }: PropsWithChildren) {
 	}
 
 	useEffect(() => {
-		console.log(
-			`TaskStorageProvider: Updated tasks array. IDs=${tasks.map((task) => task.id).join(', ')}`
-		)
-	}, [tasks])
+		serviceInstance.current.triggerMutation()
+	}, [])
 
 	return (
 		<TaskStorageContext.Provider

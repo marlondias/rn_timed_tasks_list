@@ -1,66 +1,65 @@
 import { Task } from '@/types/Task'
 import { TimerDuration } from '@/types/TimerDuration'
+import { TaskStorageDatabase } from './TaskStorageDatabase'
 
 class TaskStorageService {
-	private readonly tasks: Map<number, Task> = new Map()
-	private orderedTaskIds: number[] = []
-	private nextId: number = 1
+	private readonly database = new TaskStorageDatabase()
+	private tasks: Task[] = []
 	public onDataMutation?: () => void
 
-	public add(title: string, duration: TimerDuration): void {
+	public async add(title: string, duration: TimerDuration): Promise<void> {
 		const newTask = this.getNewTask(title, duration)
-		this.tasks.set(newTask.id, newTask)
-		this.orderedTaskIds.push(newTask.id)
-		this.triggerMutation()
+		await this.database.insertTask(newTask).then(() => this.triggerMutation())
 	}
 
-	public duplicate(taskId: number): void {
+	public async duplicate(taskId: number): Promise<void> {
 		const existingTask = this.get(taskId)
 		const newTask = this.getNewTask(existingTask.title, existingTask.duration)
-		this.tasks.set(newTask.id, newTask)
-		this.orderedTaskIds.push(newTask.id) //FIXME
-		this.triggerMutation()
+		await this.database.insertTask(newTask).then(() => this.triggerMutation())
 	}
 
-	public modify(taskId: number, title: string, duration: TimerDuration): void {
+	public async modify(
+		taskId: number,
+		title: string,
+		duration: TimerDuration
+	): Promise<void> {
 		const oldTask = this.get(taskId)
 		const newTask = { ...oldTask, title, duration }
-		this.tasks.set(oldTask.id, newTask)
-		this.triggerMutation()
+		await this.database.updateTask(newTask).then(() => this.triggerMutation())
 	}
 
-	public remove(taskId: number): void {
-		this.tasks.delete(taskId)
-		this.orderedTaskIds = this.orderedTaskIds.filter((id) => id !== taskId)
-		this.triggerMutation()
+	public async remove(taskId: number): Promise<void> {
+		await this.database.deleteTask(taskId).then(() => this.triggerMutation())
 	}
 
 	public get(taskId: number): Task {
-		const task = this.tasks.get(taskId)
-		if (!task) {
+		const filteredTasks = this.tasks.filter((task) => task.id === taskId)
+		if (filteredTasks.length < 1) {
 			throw new Error(`No task found with ID ${taskId}`)
 		}
-		return task
+		return filteredTasks[0]
 	}
 
 	public getAll(): Task[] {
-		return this.orderedTaskIds.map((id) => this.get(id))
+		return [...this.tasks]
+	}
+
+	public async triggerMutation(): Promise<void> {
+		this.tasks = await this.database.getTasks()
+
+		if (this.onDataMutation) {
+			this.onDataMutation()
+		}
 	}
 
 	private getNewTask(title: string, duration: TimerDuration): Task {
 		return {
-			id: this.nextId++,
+			id: Number.NaN,
 			title,
 			duration,
 			createdAt: new Date(),
 			isRunning: false,
 			remainingTimeInSeconds: 0,
-		}
-	}
-
-	private triggerMutation(): void {
-		if (this.onDataMutation) {
-			this.onDataMutation()
 		}
 	}
 }
