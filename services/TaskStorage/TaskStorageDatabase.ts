@@ -70,6 +70,7 @@ export class TaskStorageDatabase {
 				task.isRunning ? 1 : 0,
 				task.createdAt.toISOString(),
 				task.completedAt?.toISOString() ?? null,
+				task.id,
 			]
 		)
 	}
