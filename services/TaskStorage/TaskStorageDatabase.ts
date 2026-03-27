@@ -93,7 +93,7 @@ export class TaskStorageDatabase {
 				remainingTimeInSeconds: row.remaining_time_in_seconds,
 				isRunning: row.is_running !== 0,
 				createdAt: new Date(row.created_at),
-				completedAt: !!row.created_at ? new Date(row.created_at) : undefined,
+				completedAt: !!row.completed_at ? new Date(row.completed_at) : undefined,
 			}
 		})
 	}
