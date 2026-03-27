@@ -25,9 +25,9 @@ export function TaskList() {
 			)}
 
 			<ScrollView contentContainerStyle={styles.scrollContent}>
-				{tasks.map((task, index) => (
+				{tasks.map((task) => (
 					<TaskItem
-						key={index}
+						key={task.id}
 						task={task}
 						onPressPlay={(taskId) => {
 							console.log(`PLAY task ID=${taskId}`)
