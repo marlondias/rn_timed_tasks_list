@@ -1,9 +1,10 @@
 import { OptionsButton } from '@/components/ui/OptionsButton'
 import { MenuAction, MenuView } from '@react-native-menu/menu'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useColorScheme } from 'react-native'
 
 type Props = {
+	allowEdit: boolean
 	onMenuOpen?: () => void
 	onMenuClose?: () => void
 	onPressEdit?: () => void
@@ -15,25 +16,8 @@ const MENU_ID_FOR_EDIT = 'edit'
 const MENU_ID_FOR_DUPLICATE = 'duplicate'
 const MENU_ID_FOR_REMOVE = 'remove'
 
-const menuActions: MenuAction[] = [
-	{
-		id: MENU_ID_FOR_EDIT,
-		title: 'Edit',
-	},
-	{
-		id: MENU_ID_FOR_DUPLICATE,
-		title: 'Duplicate',
-	},
-	{
-		id: MENU_ID_FOR_REMOVE,
-		title: 'Remove',
-		attributes: {
-			destructive: true,
-		},
-	},
-]
-
 export function OptionsMenu({
+	allowEdit,
 	onMenuOpen,
 	onMenuClose,
 	onPressEdit,
@@ -42,9 +26,32 @@ export function OptionsMenu({
 }: Props) {
 	const isDarkMode = useColorScheme() === 'dark'
 
+	const menuActions: MenuAction[] = useMemo(() => {
+		return [
+			{
+				id: MENU_ID_FOR_EDIT,
+				title: 'Edit',
+				attributes: {
+					disabled: !allowEdit,
+				},
+			},
+			{
+				id: MENU_ID_FOR_DUPLICATE,
+				title: 'Duplicate',
+			},
+			{
+				id: MENU_ID_FOR_REMOVE,
+				title: 'Remove',
+				attributes: {
+					destructive: true,
+				},
+			},
+		]
+	}, [allowEdit])
+
 	const onAction = useCallback(
 		(actionId: string): void => {
-			if (actionId === MENU_ID_FOR_EDIT && onPressEdit) {
+			if (actionId === MENU_ID_FOR_EDIT && onPressEdit && allowEdit) {
 				onPressEdit()
 			}
 

@@ -90,6 +90,7 @@ export function TaskItem({
 					)}
 
 					<OptionsMenu
+						allowEdit={!task.isRunning}
 						onPressEdit={() => onPressEdit(task.id)}
 						onPressDuplicate={() => onPressDuplicate(task.id)}
 						onPressRemove={() => onPressRemove(task.id)}
