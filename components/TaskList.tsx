@@ -19,7 +19,7 @@ export function TaskList() {
 					initialTitle={taskBeingEdited.title}
 					initialDuration={taskBeingEdited.duration}
 					onConfirmEditing={(title, duration) => {
-						taskStorageService.modify(taskBeingEdited.id, title, duration)
+						taskStorageService.modify(taskBeingEdited.id, { title, duration })
 					}}
 				/>
 			)}
@@ -29,11 +29,15 @@ export function TaskList() {
 					<TaskItem
 						key={task.id}
 						task={task}
-						onPressPlay={(taskId) => {
-							console.log(`PLAY task ID=${taskId}`)
+						onPressPlay={() => {
+							return Promise.all([
+								taskStorageService.modify(task.id, { isRunning: true }),
+							])
 						}}
-						onPressPause={(taskId) => {
-							console.log(`PAUSE task ID=${taskId}`)
+						onPressPause={() => {
+							return Promise.all([
+								taskStorageService.modify(task.id, { isRunning: false }),
+							])
 						}}
 						onPressRestart={(taskId) => {
 							console.log(`RESTART task ID=${taskId}`)
