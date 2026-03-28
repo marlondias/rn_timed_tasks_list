@@ -44,15 +44,12 @@ const getEstimatedTimeTextFromDuration = (duration: TimerDuration): string => {
 	].join(' ')
 }
 
-const getElapsedTimePercentage = (
-	duration: TimerDuration,
-	remainingTimeInSeconds: number
-): number => {
-	const timeForCompletionInSeconds =
+const getDurationAsSeconds = (duration: TimerDuration): number => {
+	return (
 		duration.hours * HOUR_IN_SECONDS +
 		duration.minutes * MINUTE_IN_SECONDS +
 		duration.seconds
-	return (remainingTimeInSeconds / timeForCompletionInSeconds) * 100
+	)
 }
 
 export function TaskItem({
@@ -98,10 +95,8 @@ export function TaskItem({
 				</View>
 			</View>
 			<ProgressBar
-				currentPercentage={getElapsedTimePercentage(
-					task.duration,
-					task.remainingTimeInSeconds
-				)}
+				currentValue={task.remainingTimeInSeconds}
+				totalValue={getDurationAsSeconds(task.duration)}
 				height={5}
 			/>
 		</View>
