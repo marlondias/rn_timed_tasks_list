@@ -18,7 +18,8 @@
 			},
 			"edgeToEdgeEnabled": true,
 			"predictiveBackGestureEnabled": false,
-			"package": "com.anonymous.async_tasks"
+			"package": "com.anonymous.async_tasks",
+			"permissions": ["android.permission.SCHEDULE_EXACT_ALARM"]
 		},
 		"plugins": [
 			"expo-router",
