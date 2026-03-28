@@ -83,9 +83,9 @@ export function TaskItem({
 						<RestartButton onPress={() => onPressRestart(task.id)} />
 					) : (
 						<PlayPauseButton
-							initialIsPlaying={task.isRunning}
-							onPlay={() => onPressPlay(task.id)}
-							onPause={() => onPressPause(task.id)}
+							isPlaying={task.isRunning}
+							onPressPlay={() => onPressPlay(task.id)}
+							onPressPause={() => onPressPause(task.id)}
 						/>
 					)}
 
