@@ -8,21 +8,24 @@ import {
 	requestPermissionsAsync,
 	SchedulableTriggerInputTypes,
 	scheduleNotificationAsync,
+	setNotificationHandler,
 } from 'expo-notifications'
-import { PropsWithChildren, useState } from 'react'
+import { PropsWithChildren, useEffect } from 'react'
 import { Alert } from 'react-native'
 
+setNotificationHandler({
+	handleNotification: async () => ({
+		shouldPlaySound: true,
+		shouldSetBadge: true,
+		shouldShowBanner: true,
+		shouldShowList: true,
+	}),
+})
+
 export function TaskNotificationProvider({ children }: PropsWithChildren) {
-	const [hasNotificationsPermission, setHasNotificationsPermission] = useState(false)
-
-	const requestPermissions = async () => {
-		if (hasNotificationsPermission) return
-
+	const requestPermissions = async (): Promise<void> => {
 		const permissionStatus = await getPermissionsAsync()
-		if (permissionStatus.granted) {
-			setHasNotificationsPermission(true)
-			return
-		}
+		if (permissionStatus.granted) return
 
 		if (
 			permissionStatus.status === PermissionStatus.DENIED &&
@@ -30,7 +33,7 @@ export function TaskNotificationProvider({ children }: PropsWithChildren) {
 		) {
 			Alert.alert(
 				'Notification permission is required',
-				'The permission for this app to send notifications was DENIED at some point before. Please, go to your settings and ALLOW notification for this app.'
+				'Please check your settings and ALLOW this app to send notifications.'
 			)
 			return
 		}
@@ -44,10 +47,9 @@ export function TaskNotificationProvider({ children }: PropsWithChildren) {
 		}
 	}
 
-	const sendNotification = async (request: NotificationRequestInput) => {
-		await requestPermissions()
-
-		if (!hasNotificationsPermission) {
+	const sendNotification = async (request: NotificationRequestInput): Promise<void> => {
+		const permissionStatus = await getPermissionsAsync()
+		if (!permissionStatus.granted) {
 			Alert.alert('Permission denied', 'Cannot send notification without permission.')
 			return
 		}
@@ -65,7 +67,6 @@ export function TaskNotificationProvider({ children }: PropsWithChildren) {
 			content: {
 				title: 'Task Alarm',
 				body: `Your task "${task.title}" is done!`,
-				color: 'ff3333',
 				interruptionLevel: 'timeSensitive',
 			},
 			trigger: {
@@ -74,6 +75,10 @@ export function TaskNotificationProvider({ children }: PropsWithChildren) {
 			},
 		}
 	}
+
+	useEffect(() => {
+		requestPermissions()
+	}, [])
 
 	return (
 		<TaskNotificationContext.Provider
