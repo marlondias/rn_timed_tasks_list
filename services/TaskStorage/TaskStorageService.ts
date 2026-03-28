@@ -50,13 +50,16 @@ class TaskStorageService {
 	}
 
 	private getNewTask(title: string, duration: TimerDuration): Task {
+		const durationInSeconds =
+			duration.hours * 3600 + duration.minutes * 60 + duration.seconds
+
 		return {
 			id: Number.NaN,
 			title,
 			duration,
 			createdAt: new Date(),
 			isRunning: false,
-			remainingTimeInSeconds: 0,
+			remainingTimeInSeconds: durationInSeconds,
 		}
 	}
 }
