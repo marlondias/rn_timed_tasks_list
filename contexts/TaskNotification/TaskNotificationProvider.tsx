@@ -1,22 +1,31 @@
 import { TaskNotificationContext } from '@/contexts/TaskNotification/TaskNotificationContext'
-import * as Notifications from 'expo-notifications'
-import { PropsWithChildren, useCallback, useState } from 'react'
+import { Task } from '@/types/Task'
+import {
+	cancelScheduledNotificationAsync,
+	getPermissionsAsync,
+	NotificationRequestInput,
+	PermissionStatus,
+	requestPermissionsAsync,
+	SchedulableTriggerInputTypes,
+	scheduleNotificationAsync,
+} from 'expo-notifications'
+import { PropsWithChildren, useState } from 'react'
 import { Alert } from 'react-native'
 
 export function TaskNotificationProvider({ children }: PropsWithChildren) {
 	const [hasNotificationsPermission, setHasNotificationsPermission] = useState(false)
 
-	const requestPermissions = useCallback(async () => {
+	const requestPermissions = async () => {
 		if (hasNotificationsPermission) return
 
-		const permissionStatus = await Notifications.getPermissionsAsync()
+		const permissionStatus = await getPermissionsAsync()
 		if (permissionStatus.granted) {
 			setHasNotificationsPermission(true)
 			return
 		}
 
 		if (
-			permissionStatus.status === Notifications.PermissionStatus.DENIED &&
+			permissionStatus.status === PermissionStatus.DENIED &&
 			!permissionStatus.canAskAgain
 		) {
 			Alert.alert(
@@ -26,16 +35,16 @@ export function TaskNotificationProvider({ children }: PropsWithChildren) {
 			return
 		}
 
-		const permissionResponse = await Notifications.requestPermissionsAsync()
+		const permissionResponse = await requestPermissionsAsync()
 		if (!permissionResponse.granted) {
 			Alert.alert(
 				'Notification permission is required',
 				'For alarms to work, please ALLOW this app to send notifications.'
 			)
 		}
-	}, [hasNotificationsPermission, setHasNotificationsPermission])
+	}
 
-	const sendNotification = async (request: Notifications.NotificationRequestInput) => {
+	const sendNotification = async (request: NotificationRequestInput) => {
 		await requestPermissions()
 
 		if (!hasNotificationsPermission) {
@@ -43,13 +52,38 @@ export function TaskNotificationProvider({ children }: PropsWithChildren) {
 			return
 		}
 
-		await Notifications.scheduleNotificationAsync({ ...request })
+		await scheduleNotificationAsync({ ...request })
+	}
+
+	const getIdentifierFromTask = (task: Task): string => {
+		return `task_${task.id}_alarm`
+	}
+
+	const getRequestFromTask = (task: Task): NotificationRequestInput => {
+		return {
+			identifier: getIdentifierFromTask(task),
+			content: {
+				title: 'Task Alarm',
+				body: `Your task "${task.title}" is done!`,
+				color: 'ff3333',
+				interruptionLevel: 'timeSensitive',
+			},
+			trigger: {
+				type: SchedulableTriggerInputTypes.TIME_INTERVAL,
+				seconds: task.remainingTimeInSeconds,
+			},
+		}
 	}
 
 	return (
 		<TaskNotificationContext.Provider
 			value={{
-				sendNotificationNow: (content) => sendNotification({ content, trigger: null }),
+				sendImmediateNotification: (content) =>
+					sendNotification({ content, trigger: null }),
+				scheduleTaskAlarmNotification: (task) =>
+					sendNotification(getRequestFromTask(task)),
+				cancelTaskAlarmNotification: (task) =>
+					cancelScheduledNotificationAsync(getIdentifierFromTask(task)),
 			}}
 		>
 			{children}
