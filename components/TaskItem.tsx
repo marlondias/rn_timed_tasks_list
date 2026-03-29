@@ -7,6 +7,7 @@ import { useTaskNotification } from '@/contexts/TaskNotification/TaskNotificatio
 import { useTaskStorage } from '@/contexts/TaskStorage/TaskStorageContext'
 import { Task } from '@/types/Task'
 import { TimerDuration } from '@/types/TimerDuration'
+import { convertDurationToSeconds, convertSecondsToDuration } from '@/utils/TimeUtils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
@@ -17,22 +18,13 @@ type Props = {
 	onPressRemove: (taskId: number) => void
 }
 
-const MINUTE_IN_SECONDS = 60
-const HOUR_IN_SECONDS = 60 * MINUTE_IN_SECONDS
-
 const getEstimatedTimeText = (timeInSeconds: number): string => {
-	if (!Number.isFinite(timeInSeconds) || timeInSeconds <= 0) {
-		return '0s'
-	}
-
-	const hoursOnly = Math.floor(timeInSeconds / HOUR_IN_SECONDS)
-	const minutesOnly = Math.floor((timeInSeconds % HOUR_IN_SECONDS) / MINUTE_IN_SECONDS)
-	const secondsOnly = timeInSeconds % MINUTE_IN_SECONDS
+	const { hours, minutes, seconds } = convertSecondsToDuration(timeInSeconds)
 
 	return [
-		hoursOnly > 0 ? `${hoursOnly}h` : '',
-		minutesOnly > 0 ? `${minutesOnly}m` : '',
-		secondsOnly > 0 ? `${secondsOnly}s` : '0s',
+		hours > 0 ? `${hours}h` : '',
+		minutes > 0 ? `${minutes}m` : '',
+		seconds > 0 ? `${seconds}s` : '0s',
 	].join(' ')
 }
 
@@ -42,14 +34,6 @@ const getEstimatedTimeTextFromDuration = (duration: TimerDuration): string => {
 		duration.minutes > 0 ? `${duration.minutes}m` : '',
 		duration.seconds > 0 ? `${duration.seconds}s` : '0s',
 	].join(' ')
-}
-
-const getDurationAsSeconds = (duration: TimerDuration): number => {
-	return (
-		duration.hours * HOUR_IN_SECONDS +
-		duration.minutes * MINUTE_IN_SECONDS +
-		duration.seconds
-	)
 }
 
 export function TaskItem({ task, onPressEdit, onPressDuplicate, onPressRemove }: Props) {
@@ -85,17 +69,17 @@ export function TaskItem({ task, onPressEdit, onPressDuplicate, onPressRemove }:
 						Duration: {getEstimatedTimeTextFromDuration(task.duration)}
 					</Text>
 					<Text style={styles.subText}>
-						Remaining: {getEstimatedTimeText(task.remainingTimeInSeconds)}
+						Remaining: {getEstimatedTimeText(visualRemainingTimeInSeconds)}
 					</Text>
 				</View>
 				<View style={styles.controlsWrapper}>
 					{isCompleted ? (
 						<RestartButton
 							onPress={() => {
-								setVisualRemainingTimeInSeconds(getDurationAsSeconds(task.duration))
+								setVisualRemainingTimeInSeconds(convertDurationToSeconds(task.duration))
 								taskStorageService.modify(task.id, {
 									isRunning: false,
-									remainingTimeInSeconds: getDurationAsSeconds(task.duration),
+									remainingTimeInSeconds: convertDurationToSeconds(task.duration),
 								})
 							}}
 						/>
@@ -130,7 +114,7 @@ export function TaskItem({ task, onPressEdit, onPressDuplicate, onPressRemove }:
 			</View>
 			<ProgressBar
 				currentValue={visualRemainingTimeInSeconds}
-				totalValue={getDurationAsSeconds(task.duration)}
+				totalValue={convertDurationToSeconds(task.duration)}
 				height={5}
 			/>
 		</View>
