@@ -33,21 +33,6 @@ export function TaskList() {
 					<TaskItem
 						key={task.id}
 						task={task}
-						onPressPlay={() => {
-							return Promise.all([
-								taskStorageService.modify(task.id, { isRunning: true }),
-								scheduleTaskAlarmNotification(task),
-							])
-						}}
-						onPressPause={() => {
-							return Promise.all([
-								taskStorageService.modify(task.id, { isRunning: false }),
-								cancelTaskAlarmNotification(task),
-							])
-						}}
-						onPressRestart={(taskId) => {
-							console.log(`RESTART task ID=${taskId}`)
-						}}
 						onPressEdit={(taskId) => {
 							const task = taskStorageService.get(taskId)
 							setTaskBeingEdited(task)

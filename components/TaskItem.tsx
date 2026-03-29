@@ -3,16 +3,15 @@ import { PlayPauseButton } from '@/components/ui/PlayPauseButton'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { RestartButton } from '@/components/ui/RestartButton'
 import { useSecondsTicker } from '@/contexts/SecondsTicker/SecondsTickerContext'
+import { useTaskNotification } from '@/contexts/TaskNotification/TaskNotificationContext'
+import { useTaskStorage } from '@/contexts/TaskStorage/TaskStorageContext'
 import { Task } from '@/types/Task'
 import { TimerDuration } from '@/types/TimerDuration'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
 type Props = {
 	task: Task
-	onPressPlay: (taskId: number) => void
-	onPressPause: (taskId: number) => void
-	onPressRestart: (taskId: number) => void
 	onPressEdit: (taskId: number) => void
 	onPressDuplicate: (taskId: number) => void
 	onPressRemove: (taskId: number) => void
@@ -53,22 +52,27 @@ const getDurationAsSeconds = (duration: TimerDuration): number => {
 	)
 }
 
-export function TaskItem({
-	task,
-	onPressPlay,
-	onPressPause,
-	onPressRestart,
-	onPressEdit,
-	onPressDuplicate,
-	onPressRemove,
-}: Props) {
+export function TaskItem({ task, onPressEdit, onPressDuplicate, onPressRemove }: Props) {
 	const { currentTick } = useSecondsTicker()
+	const { taskStorageService } = useTaskStorage()
+	const { scheduleTaskAlarmNotification, cancelTaskAlarmNotification } =
+		useTaskNotification()
 	const [visualRemainingTimeInSeconds, setVisualRemainingTimeInSeconds] =
 		useState<number>(task.remainingTimeInSeconds)
 
+	const isCompleted = useMemo(
+		(): boolean => !task.isRunning && task.remainingTimeInSeconds === 0,
+		[task]
+	)
+
 	useEffect(() => {
-		if (!task.isRunning || visualRemainingTimeInSeconds < 1) return
-		console.log('use fx decrement')
+		if (!task.isRunning) return
+
+		if (visualRemainingTimeInSeconds < 1) {
+			taskStorageService.modify(task.id, { isRunning: false, remainingTimeInSeconds: 0 })
+			return
+		}
+
 		setVisualRemainingTimeInSeconds((prev) => prev - 1)
 	}, [currentTick])
 
@@ -85,13 +89,34 @@ export function TaskItem({
 					</Text>
 				</View>
 				<View style={styles.controlsWrapper}>
-					{task.completedAt ? (
-						<RestartButton onPress={() => onPressRestart(task.id)} />
+					{isCompleted ? (
+						<RestartButton
+							onPress={() => {
+								setVisualRemainingTimeInSeconds(getDurationAsSeconds(task.duration))
+								taskStorageService.modify(task.id, {
+									isRunning: false,
+									remainingTimeInSeconds: getDurationAsSeconds(task.duration),
+								})
+							}}
+						/>
 					) : (
 						<PlayPauseButton
 							isPlaying={task.isRunning}
-							onPressPlay={() => onPressPlay(task.id)}
-							onPressPause={() => onPressPause(task.id)}
+							onPressPlay={() => {
+								return Promise.all([
+									scheduleTaskAlarmNotification(task),
+									taskStorageService.modify(task.id, { isRunning: true }),
+								])
+							}}
+							onPressPause={() => {
+								return Promise.all([
+									cancelTaskAlarmNotification(task),
+									taskStorageService.modify(task.id, {
+										isRunning: false,
+										remainingTimeInSeconds: visualRemainingTimeInSeconds,
+									}),
+								])
+							}}
 						/>
 					)}
 
