@@ -5,12 +5,14 @@
 - Botão de configurações no canto direito do header. Deve abrir tela própria.
 - Context para preferências de usuário, usando persistência SQLite.
 - Seletor de idioma (EN, ES, PT, FR)
+- Melhorar experiência no momento do alarme. Usar tela cheia ou ações na notificação.
 
 ## Bugs and problems
 
-- Está faltando alarmes nesse app. Por enquanto só gera notificações.
 - Centralizar esquema de cores / padronizar
 - Centralizar valores relevantes do app (números, textos)
+- Change the icons.
+- Decide on the project name and change it everywhere.
 
 ## Obs
 
