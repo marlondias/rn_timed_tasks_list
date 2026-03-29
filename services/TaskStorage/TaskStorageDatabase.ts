@@ -56,7 +56,7 @@ export class TaskStorageDatabase {
 					duration_seconds = ?,
 					remaining_time_in_seconds = ?,
 					is_running = ?,
-					created_at = ?,
+					created_at = ?
 				WHERE id = ?
 			`,
 			[
