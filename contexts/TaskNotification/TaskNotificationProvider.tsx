@@ -1,6 +1,7 @@
 import { TaskNotificationContext } from '@/contexts/TaskNotification/TaskNotificationContext'
 import { Task } from '@/types/Task'
 import {
+	AndroidImportance,
 	cancelScheduledNotificationAsync,
 	getPermissionsAsync,
 	NotificationRequestInput,
@@ -8,6 +9,7 @@ import {
 	requestPermissionsAsync,
 	SchedulableTriggerInputTypes,
 	scheduleNotificationAsync,
+	setNotificationChannelAsync,
 	setNotificationHandler,
 } from 'expo-notifications'
 import { PropsWithChildren, useEffect } from 'react'
@@ -72,12 +74,19 @@ export function TaskNotificationProvider({ children }: PropsWithChildren) {
 			trigger: {
 				type: SchedulableTriggerInputTypes.TIME_INTERVAL,
 				seconds: task.remainingTimeInSeconds,
+				channelId: 'alarms',
 			},
 		}
 	}
 
 	useEffect(() => {
 		requestPermissions()
+
+		setNotificationChannelAsync('alarms', {
+			name: 'Task Alarms',
+			importance: AndroidImportance.HIGH,
+			sound: 'alarm.wav',
+		})
 	}, [])
 
 	return (
