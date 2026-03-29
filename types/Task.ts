@@ -7,7 +7,6 @@ export type Task = {
 	remainingTimeInSeconds: number
 	isRunning: boolean
 	createdAt: Date
-	completedAt?: Date
 }
 
 export type TaskModifiableProps = {
