@@ -10,7 +10,6 @@ type TaskRow = {
 	remaining_time_in_seconds: number
 	is_running: number
 	created_at: string
-	completed_at: string | null
 }
 
 const sqliteFilename = 'tasks.db'
@@ -57,8 +56,7 @@ export class TaskStorageDatabase {
 					duration_seconds = ?,
 					remaining_time_in_seconds = ?,
 					is_running = ?,
-					created_at = ?,
-					completed_at = ?
+					created_at = ?
 				WHERE id = ?
 			`,
 			[
@@ -69,7 +67,6 @@ export class TaskStorageDatabase {
 				task.remainingTimeInSeconds,
 				task.isRunning ? 1 : 0,
 				task.createdAt.toISOString(),
-				task.completedAt?.toISOString() ?? null,
 				task.id,
 			]
 		)
@@ -94,7 +91,6 @@ export class TaskStorageDatabase {
 				remainingTimeInSeconds: row.remaining_time_in_seconds,
 				isRunning: row.is_running !== 0,
 				createdAt: new Date(row.created_at),
-				completedAt: !!row.completed_at ? new Date(row.completed_at) : undefined,
 			}
 		})
 	}
@@ -109,8 +105,7 @@ export class TaskStorageDatabase {
         duration_seconds INTEGER NOT NULL,
         remaining_time_in_seconds INTEGER NOT NULL DEFAULT 0,
         is_running INTEGER NOT NULL DEFAULT 0,
-        created_at TEXT NOT NULL,
-        completed_at TEXT
+        created_at TEXT NOT NULL
       );
     `)
 	}

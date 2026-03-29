@@ -6,8 +6,7 @@ type Props = {
 }
 
 export function OptionsButton({ onPress }: Props) {
-	const colorScheme = useColorScheme()
-	const isDarkMode = colorScheme === 'dark'
+	const isDarkMode = useColorScheme() === 'dark'
 
 	return (
 		<TouchableOpacity activeOpacity={0.8} onPress={onPress}>

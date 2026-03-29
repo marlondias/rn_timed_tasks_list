@@ -1,32 +1,29 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
-import { useState } from 'react'
 import { TouchableOpacity, useColorScheme, View } from 'react-native'
 
 type Props = {
-	initialIsPlaying?: boolean
-	onPause?: () => void
-	onPlay?: () => void
+	isPlaying: boolean
+	onPressPlay?: () => void
+	onPressPause?: () => void
 }
 
-export function PlayPauseButton({ initialIsPlaying, onPause, onPlay }: Props) {
-	const [isPlaying, setIsPlaying] = useState(initialIsPlaying ?? false)
-	const colorScheme = useColorScheme()
-	const isDarkMode = colorScheme === 'dark'
+export function PlayPauseButton({ isPlaying, onPressPlay, onPressPause }: Props) {
+	const isDarkMode = useColorScheme() === 'dark'
 
 	return (
 		<TouchableOpacity
 			activeOpacity={0.5}
-			onPress={() =>
-				setIsPlaying((prev) => {
-					if (!prev && onPlay) {
-						onPlay()
-					}
-					if (prev && onPause) {
-						onPause()
-					}
-					return !prev
-				})
-			}
+			onPress={() => {
+				if (isPlaying && onPressPause) {
+					onPressPause()
+					return
+				}
+
+				if (!isPlaying && onPressPlay) {
+					onPressPlay()
+					return
+				}
+			}}
 		>
 			<View
 				style={{

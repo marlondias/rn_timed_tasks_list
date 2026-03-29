@@ -1,4 +1,4 @@
-import { Task } from '@/types/Task'
+import { Task, TaskModifiableProps } from '@/types/Task'
 import { TimerDuration } from '@/types/TimerDuration'
 import { TaskStorageDatabase } from './TaskStorageDatabase'
 
@@ -18,14 +18,11 @@ class TaskStorageService {
 		await this.database.insertTask(newTask).then(() => this.triggerMutation())
 	}
 
-	public async modify(
-		taskId: number,
-		title: string,
-		duration: TimerDuration
-	): Promise<void> {
+	public async modify(taskId: number, modifiedTask: TaskModifiableProps): Promise<void> {
 		const oldTask = this.get(taskId)
-		const newTask = { ...oldTask, title, duration }
-		await this.database.updateTask(newTask).then(() => this.triggerMutation())
+		await this.database
+			.updateTask({ ...oldTask, ...modifiedTask })
+			.then(() => this.triggerMutation())
 	}
 
 	public async remove(taskId: number): Promise<void> {
@@ -53,13 +50,16 @@ class TaskStorageService {
 	}
 
 	private getNewTask(title: string, duration: TimerDuration): Task {
+		const durationInSeconds =
+			duration.hours * 3600 + duration.minutes * 60 + duration.seconds
+
 		return {
 			id: Number.NaN,
 			title,
 			duration,
 			createdAt: new Date(),
 			isRunning: false,
-			remainingTimeInSeconds: 0,
+			remainingTimeInSeconds: durationInSeconds,
 		}
 	}
 }

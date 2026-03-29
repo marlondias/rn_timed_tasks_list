@@ -1,5 +1,6 @@
 import { EditTaskModal } from '@/components/EditTaskModal'
-import { TaskItem } from '@/components/ui/TaskItem'
+import { TaskItem } from '@/components/TaskItem'
+import { useTaskNotification } from '@/contexts/TaskNotification/TaskNotificationContext'
 import { useTaskStorage } from '@/contexts/TaskStorage/TaskStorageContext'
 import { Task } from '@/types/Task'
 import { useState } from 'react'
@@ -7,6 +8,9 @@ import { ScrollView, StyleSheet, View } from 'react-native'
 
 export function TaskList() {
 	const { tasks, taskStorageService } = useTaskStorage()
+	const { scheduleTaskAlarmNotification, cancelTaskAlarmNotification } =
+		useTaskNotification()
+
 	const [isEditModalVisible, setIsEditModalVisible] = useState(false)
 	const [taskBeingEdited, setTaskBeingEdited] = useState<Task>()
 
@@ -19,7 +23,7 @@ export function TaskList() {
 					initialTitle={taskBeingEdited.title}
 					initialDuration={taskBeingEdited.duration}
 					onConfirmEditing={(title, duration) => {
-						taskStorageService.modify(taskBeingEdited.id, title, duration)
+						taskStorageService.modify(taskBeingEdited.id, { title, duration })
 					}}
 				/>
 			)}
@@ -29,15 +33,6 @@ export function TaskList() {
 					<TaskItem
 						key={task.id}
 						task={task}
-						onPressPlay={(taskId) => {
-							console.log(`PLAY task ID=${taskId}`)
-						}}
-						onPressPause={(taskId) => {
-							console.log(`PAUSE task ID=${taskId}`)
-						}}
-						onPressRestart={(taskId) => {
-							console.log(`RESTART task ID=${taskId}`)
-						}}
 						onPressEdit={(taskId) => {
 							const task = taskStorageService.get(taskId)
 							setTaskBeingEdited(task)
