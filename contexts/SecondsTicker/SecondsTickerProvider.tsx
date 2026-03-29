@@ -6,7 +6,6 @@ export function SecondsTickerProvider({ children }: PropsWithChildren) {
 
 	const updateTick = () => {
 		setCurrentTick((prev) => (prev < Number.MAX_SAFE_INTEGER ? prev + 1 : 0))
-		console.log('TICK')
 	}
 
 	useEffect(() => {
