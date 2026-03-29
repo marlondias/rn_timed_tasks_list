@@ -1,5 +1,5 @@
 import { EditTaskModal } from '@/components/EditTaskModal'
-import { TaskItem } from '@/components/ui/TaskItem'
+import { TaskItem } from '@/components/TaskItem'
 import { useTaskNotification } from '@/contexts/TaskNotification/TaskNotificationContext'
 import { useTaskStorage } from '@/contexts/TaskStorage/TaskStorageContext'
 import { Task } from '@/types/Task'
