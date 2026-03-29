@@ -2,9 +2,10 @@ import { OptionsMenu } from '@/components/ui/OptionsMenu'
 import { PlayPauseButton } from '@/components/ui/PlayPauseButton'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { RestartButton } from '@/components/ui/RestartButton'
+import { useSecondsTicker } from '@/contexts/SecondsTicker/SecondsTickerContext'
 import { Task } from '@/types/Task'
 import { TimerDuration } from '@/types/TimerDuration'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
 type Props = {
@@ -61,7 +62,15 @@ export function TaskItem({
 	onPressDuplicate,
 	onPressRemove,
 }: Props) {
-	const isCompleted = !!task.completedAt
+	const { currentTick } = useSecondsTicker()
+	const [visualRemainingTimeInSeconds, setVisualRemainingTimeInSeconds] =
+		useState<number>(task.remainingTimeInSeconds)
+
+	useEffect(() => {
+		if (!task.isRunning || visualRemainingTimeInSeconds < 1) return
+		console.log('use fx decrement')
+		setVisualRemainingTimeInSeconds((prev) => prev - 1)
+	}, [currentTick])
 
 	return (
 		<View style={styles.container}>
@@ -69,14 +78,14 @@ export function TaskItem({
 				<View style={styles.infoWrapper}>
 					<Text style={styles.titleText}>{task.title}</Text>
 					<Text style={styles.subText}>
-						Estimated time: {getEstimatedTimeTextFromDuration(task.duration)}
+						Duration: {getEstimatedTimeTextFromDuration(task.duration)}
 					</Text>
 					<Text style={styles.subText}>
-						Remaining time: {getEstimatedTimeText(task.remainingTimeInSeconds)}
+						Remaining: {getEstimatedTimeText(task.remainingTimeInSeconds)}
 					</Text>
 				</View>
 				<View style={styles.controlsWrapper}>
-					{isCompleted ? (
+					{task.completedAt ? (
 						<RestartButton onPress={() => onPressRestart(task.id)} />
 					) : (
 						<PlayPauseButton
@@ -95,7 +104,7 @@ export function TaskItem({
 				</View>
 			</View>
 			<ProgressBar
-				currentValue={task.remainingTimeInSeconds}
+				currentValue={visualRemainingTimeInSeconds}
 				totalValue={getDurationAsSeconds(task.duration)}
 				height={5}
 			/>
