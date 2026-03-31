@@ -43,12 +43,6 @@ export function TaskList() {
 							setTaskBeingEdited(task)
 							setIsEditModalVisible(true)
 						}}
-						onPressDuplicate={(taskId) => {
-							taskStorageService.duplicate(taskId)
-						}}
-						onPressRemove={(taskId) => {
-							taskStorageService.remove(taskId)
-						}}
 					/>
 				))}
 			</ScrollView>

@@ -14,8 +14,6 @@ import { StyleSheet, Text, useColorScheme, View } from 'react-native'
 type Props = {
 	task: Task
 	onPressEdit: (taskId: number) => void
-	onPressDuplicate: (taskId: number) => void
-	onPressRemove: (taskId: number) => void
 }
 
 const getEstimatedTimeText = (timeInSeconds: number): string => {
@@ -36,7 +34,7 @@ const getEstimatedTimeTextFromDuration = (duration: TimerDuration): string => {
 	].join(' ')
 }
 
-export function TaskItem({ task, onPressEdit, onPressDuplicate, onPressRemove }: Props) {
+export function TaskItem({ task, onPressEdit }: Props) {
 	const isDarkMode = useColorScheme() === 'dark'
 	const { currentTick } = useSecondsTicker()
 	const { taskStorageService } = useTaskStorage()
@@ -134,8 +132,8 @@ export function TaskItem({ task, onPressEdit, onPressDuplicate, onPressRemove }:
 					<OptionsMenu
 						allowEdit={!task.isRunning}
 						onPressEdit={() => onPressEdit(task.id)}
-						onPressDuplicate={() => onPressDuplicate(task.id)}
-						onPressRemove={() => onPressRemove(task.id)}
+						onPressDuplicate={async () => await taskStorageService.duplicate(task.id)}
+						onPressRemove={async () => await taskStorageService.remove(task.id)}
 					/>
 				</View>
 			</View>
