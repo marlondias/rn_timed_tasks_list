@@ -1,4 +1,4 @@
-import { TimerDuration } from '@/types/TimerDuration'
+import { getZeroDuration, TimerDuration } from '@/types/TimerDuration'
 
 const MINUTE_IN_SECONDS = 60
 const HOUR_IN_SECONDS = 60 * MINUTE_IN_SECONDS
@@ -13,7 +13,7 @@ export function convertDurationToSeconds(duration: TimerDuration): number {
 
 export function convertSecondsToDuration(timeInSeconds: number): TimerDuration {
 	if (!Number.isFinite(timeInSeconds) || timeInSeconds < 0) {
-		return { hours: 0, minutes: 0, seconds: 0 }
+		return getZeroDuration()
 	}
 
 	const hours = Math.floor(timeInSeconds / HOUR_IN_SECONDS)

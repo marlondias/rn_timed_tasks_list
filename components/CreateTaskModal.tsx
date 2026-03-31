@@ -1,7 +1,7 @@
 import { CustomModal } from '@/components/ui/CustomModal'
 import { TaskTimerPicker } from '@/components/ui/TaskTimerPicker'
 import { TaskTitleInput } from '@/components/ui/TaskTitleInput'
-import { TimerDuration } from '@/types/TimerDuration'
+import { getZeroDuration, TimerDuration } from '@/types/TimerDuration'
 import { useEffect, useMemo, useState } from 'react'
 import { View } from 'react-native'
 
@@ -13,11 +13,7 @@ type Props = {
 
 export function CreateTaskModal({ isVisible, setIsVisible, onConfirmCreation }: Props) {
 	const [title, setTitle] = useState<string>('')
-	const [duration, setDuration] = useState<TimerDuration>({
-		hours: 0,
-		minutes: 0,
-		seconds: 0,
-	})
+	const [duration, setDuration] = useState<TimerDuration>(getZeroDuration())
 	const isValidForCreation: boolean = useMemo(
 		() => !!title.trim() && duration.hours + duration.minutes + duration.seconds > 0,
 		[title, duration]
@@ -26,7 +22,7 @@ export function CreateTaskModal({ isVisible, setIsVisible, onConfirmCreation }: 
 	useEffect(() => {
 		if (isVisible) return
 		setTitle('')
-		setDuration({ hours: 0, minutes: 0, seconds: 0 })
+		setDuration(getZeroDuration())
 	}, [isVisible])
 
 	return (
