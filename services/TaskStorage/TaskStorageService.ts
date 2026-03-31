@@ -21,9 +21,22 @@ class TaskStorageService {
 
 	public async modify(taskId: number, modifiedTask: TaskModifiableProps): Promise<void> {
 		const oldTask = this.get(taskId)
-		await this.database
-			.updateTask({ ...oldTask, ...modifiedTask })
-			.then(() => this.triggerMutation())
+		const newTask: Task = { ...oldTask }
+
+		if (modifiedTask.title !== undefined) {
+			newTask.title = modifiedTask.title
+		}
+		if (modifiedTask.duration !== undefined) {
+			newTask.duration = modifiedTask.duration
+		}
+		if (modifiedTask.isRunning !== undefined) {
+			newTask.isRunning = modifiedTask.isRunning
+		}
+		if (modifiedTask.remainingTimeInSeconds !== undefined) {
+			newTask.remainingTimeInSeconds = modifiedTask.remainingTimeInSeconds
+		}
+
+		await this.database.updateTask(newTask).then(() => this.triggerMutation())
 	}
 
 	public async remove(taskId: number): Promise<void> {
