@@ -1,3 +1,4 @@
+import { InputLimits } from '@/constants/InputLimits'
 import { TimerDuration } from '@/types/TimerDuration'
 import MaskedView from '@react-native-masked-view/masked-view'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -17,7 +18,7 @@ export function TaskTimerPicker({ initialDuration, onChange }: Props) {
 			initialValue={{ ...initialDuration }}
 			hideDays
 			maximumDays={0}
-			maximumHours={12}
+			maximumHours={InputLimits.TaskDurationMaxHours}
 			padMinutesWithZero
 			padSecondsWithZero
 			hourLabel="h"

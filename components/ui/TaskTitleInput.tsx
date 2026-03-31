@@ -1,3 +1,4 @@
+import { InputLimits } from '@/constants/InputLimits'
 import { useTheme } from '@react-navigation/native'
 import { useState } from 'react'
 import { StyleSheet, TextInput, useColorScheme } from 'react-native'
@@ -7,19 +8,17 @@ type Props = {
 	onChange: (title: string) => void
 }
 
-const MAX_TITLE_LENGTH = 50
-
 export function TaskTitleInput({ initialTitle, onChange }: Props) {
 	const isDarkMode = useColorScheme() === 'dark'
 	const { colors } = useTheme()
 	const [title, setTitle] = useState<string>(
-		initialTitle?.slice(0, MAX_TITLE_LENGTH) ?? ''
+		initialTitle?.slice(0, InputLimits.TaskTitleMaxLength) ?? ''
 	)
 
 	return (
 		<TextInput
 			placeholder="type in the task's title"
-			maxLength={MAX_TITLE_LENGTH}
+			maxLength={InputLimits.TaskTitleMaxLength}
 			value={title}
 			onChangeText={(text) => {
 				setTitle(text)
