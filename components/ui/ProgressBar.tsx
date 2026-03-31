@@ -23,7 +23,7 @@ export function ProgressBar({ currentValue, totalValue, height }: Props) {
 		if (
 			!Number.isFinite(currentValue) ||
 			!Number.isFinite(totalValue) ||
-			totalValue == 0
+			totalValue === 0
 		) {
 			return 0
 		}
