@@ -7,12 +7,10 @@
 - Seletor de idioma (EN, ES, PT, FR)
 - Melhorar experiência no momento do alarme. Usar tela cheia ou ações na notificação.
 
-## Bugs and problems
+## Problemas
 
-- Centralizar esquema de cores / padronizar
-- Centralizar valores relevantes do app (números, textos)
-- Change the icons.
-- Decide on the project name and change it everywhere.
+- Após editar, valor de "remaining" não acompanha o novo "duration".
+- Melhorar o SecondsTicker, pode ter time drift.
 
 ## Obs
 
