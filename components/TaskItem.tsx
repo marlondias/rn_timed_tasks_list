@@ -38,7 +38,6 @@ const getEstimatedTimeTextFromDuration = (duration: TimerDuration): string => {
 
 export function TaskItem({ task, onPressEdit, onPressDuplicate, onPressRemove }: Props) {
 	const isDarkMode = useColorScheme() === 'dark'
-
 	const { currentTick } = useSecondsTicker()
 	const { taskStorageService } = useTaskStorage()
 	const { scheduleTaskAlarmNotification, cancelTaskAlarmNotification } =
@@ -61,6 +60,10 @@ export function TaskItem({ task, onPressEdit, onPressDuplicate, onPressRemove }:
 
 		setVisualRemainingTimeInSeconds((prev) => prev - 1)
 	}, [currentTick])
+
+	useEffect(() => {
+		setVisualRemainingTimeInSeconds(task.remainingTimeInSeconds)
+	}, [task])
 
 	return (
 		<View
