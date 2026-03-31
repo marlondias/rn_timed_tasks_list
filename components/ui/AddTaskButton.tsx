@@ -1,24 +1,21 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
-import { StyleSheet, TouchableOpacity, useColorScheme } from 'react-native'
+import { useTheme } from '@react-navigation/native'
+import { StyleSheet, TouchableOpacity } from 'react-native'
 
 type Props = {
 	onPress: () => void
 }
 
 export function AddTaskButton({ onPress }: Props) {
-	const isDarkMode = useColorScheme() === 'dark'
+	const { colors } = useTheme()
 
 	return (
 		<TouchableOpacity
 			activeOpacity={0.8}
-			style={{ ...styles.button, backgroundColor: isDarkMode ? 'black' : 'white' }}
+			style={{ ...styles.button, backgroundColor: colors.card }}
 			onPress={onPress}
 		>
-			<MaterialCommunityIcons
-				name="plus"
-				size={42}
-				color={isDarkMode ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.75)'}
-			/>
+			<MaterialCommunityIcons name="plus" size={42} color={colors.text} />
 		</TouchableOpacity>
 	)
 }
@@ -32,7 +29,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		aspectRatio: 1,
 		borderRadius: '50%',
-		elevation: 10,
-		backgroundColor: 'white',
+		elevation: 6,
 	},
 })
