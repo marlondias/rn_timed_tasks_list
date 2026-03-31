@@ -1,5 +1,6 @@
 import { Task, TaskModifiableProps } from '@/types/Task'
 import { TimerDuration } from '@/types/TimerDuration'
+import { convertDurationToSeconds } from '@/utils/TimeUtils'
 import { TaskStorageDatabase } from './TaskStorageDatabase'
 
 class TaskStorageService {
@@ -50,8 +51,7 @@ class TaskStorageService {
 	}
 
 	private getNewTask(title: string, duration: TimerDuration): Task {
-		const durationInSeconds =
-			duration.hours * 3600 + duration.minutes * 60 + duration.seconds
+		const durationInSeconds = convertDurationToSeconds(duration)
 
 		return {
 			id: Number.NaN,
