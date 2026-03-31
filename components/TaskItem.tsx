@@ -9,7 +9,7 @@ import { Task } from '@/types/Task'
 import { TimerDuration } from '@/types/TimerDuration'
 import { convertDurationToSeconds, convertSecondsToDuration } from '@/utils/TimeUtils'
 import React, { useEffect, useMemo, useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, useColorScheme, View } from 'react-native'
 
 type Props = {
 	task: Task
@@ -37,6 +37,8 @@ const getEstimatedTimeTextFromDuration = (duration: TimerDuration): string => {
 }
 
 export function TaskItem({ task, onPressEdit, onPressDuplicate, onPressRemove }: Props) {
+	const isDarkMode = useColorScheme() === 'dark'
+
 	const { currentTick } = useSecondsTicker()
 	const { taskStorageService } = useTaskStorage()
 	const { scheduleTaskAlarmNotification, cancelTaskAlarmNotification } =
@@ -61,14 +63,36 @@ export function TaskItem({ task, onPressEdit, onPressDuplicate, onPressRemove }:
 	}, [currentTick])
 
 	return (
-		<View style={styles.container}>
+		<View
+			style={{
+				...styles.container,
+				...(isDarkMode ? styles.containerDarkMode : styles.containerLightMode),
+			}}
+		>
 			<View style={styles.content}>
 				<View style={styles.infoWrapper}>
-					<Text style={styles.titleText}>{task.title}</Text>
-					<Text style={styles.subText}>
+					<Text
+						style={{
+							...styles.titleText,
+							...(isDarkMode ? styles.textColorDarkMode : styles.textColorLightMode),
+						}}
+					>
+						{task.title}
+					</Text>
+					<Text
+						style={{
+							...styles.subText,
+							...(isDarkMode ? styles.textColorDarkMode : styles.textColorLightMode),
+						}}
+					>
 						Duration: {getEstimatedTimeTextFromDuration(task.duration)}
 					</Text>
-					<Text style={styles.subText}>
+					<Text
+						style={{
+							...styles.subText,
+							...(isDarkMode ? styles.textColorDarkMode : styles.textColorLightMode),
+						}}
+					>
 						Remaining: {getEstimatedTimeText(visualRemainingTimeInSeconds)}
 					</Text>
 				</View>
@@ -124,10 +148,16 @@ export function TaskItem({ task, onPressEdit, onPressDuplicate, onPressRemove }:
 const styles = StyleSheet.create({
 	container: {
 		width: '100%',
-		backgroundColor: '#8dc8bd',
 		marginVertical: 4,
 		borderRadius: 10,
 		overflow: 'hidden',
+	},
+	containerLightMode: {
+		backgroundColor: 'rgb(199, 174, 62)',
+		elevation: 2,
+	},
+	containerDarkMode: {
+		backgroundColor: 'rgb(167, 145, 49)',
 	},
 	content: {
 		flex: 1,
@@ -152,13 +182,19 @@ const styles = StyleSheet.create({
 		gap: 15,
 	},
 	titleText: {
-		color: '#fff',
 		fontSize: 16,
 		fontWeight: '600',
 	},
 	subText: {
-		color: 'rgba(255,255,255,0.8)',
 		fontSize: 12,
 		marginTop: 2,
+	},
+	textColorLightMode: {
+		mixBlendMode: 'multiply',
+		color: 'rgba(0, 0, 0, 0.65)',
+	},
+	textColorDarkMode: {
+		mixBlendMode: 'overlay',
+		color: 'rgba(255, 255, 255, 0.9)',
 	},
 })
