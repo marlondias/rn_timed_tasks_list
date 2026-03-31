@@ -63,7 +63,7 @@ export function OptionsMenu({
 				onPressRemove()
 			}
 		},
-		[onPressEdit, onPressDuplicate, onPressRemove]
+		[allowEdit, onPressEdit, onPressDuplicate, onPressRemove]
 	)
 
 	return (
