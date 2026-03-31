@@ -2,6 +2,7 @@ import { CustomModal } from '@/components/ui/CustomModal'
 import { TaskTimerPicker } from '@/components/ui/TaskTimerPicker'
 import { TaskTitleInput } from '@/components/ui/TaskTitleInput'
 import { TimerDuration } from '@/types/TimerDuration'
+import { isDurationZero } from '@/utils/TimeUtils'
 import { useEffect, useMemo, useState } from 'react'
 import { View } from 'react-native'
 
@@ -23,7 +24,7 @@ export function EditTaskModal({
 	const [title, setTitle] = useState<string>(initialTitle)
 	const [duration, setDuration] = useState<TimerDuration>(initialDuration)
 	const isValidForEditing: boolean = useMemo(
-		() => !!title.trim() && duration.hours + duration.minutes + duration.seconds > 0,
+		() => !!title.trim() && !isDurationZero(duration),
 		[title, duration]
 	)
 

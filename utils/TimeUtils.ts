@@ -22,3 +22,7 @@ export function convertSecondsToDuration(timeInSeconds: number): TimerDuration {
 
 	return { hours, minutes, seconds }
 }
+
+export function isDurationZero(duration: TimerDuration): boolean {
+	return !(duration.seconds > 0 || duration.minutes > 0 || duration.hours > 0)
+}
