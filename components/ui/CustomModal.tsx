@@ -1,3 +1,4 @@
+import { useTheme } from '@react-navigation/native'
 import { PropsWithChildren } from 'react'
 import {
 	Button,
@@ -25,6 +26,7 @@ export function CustomModal({
 	buttons,
 }: Props & PropsWithChildren) {
 	const isDarkMode = useColorScheme() === 'dark'
+	const { colors } = useTheme()
 
 	return (
 		<Modal
@@ -43,7 +45,8 @@ export function CustomModal({
 					<View
 						style={{
 							...styles.modal,
-							...(isDarkMode ? styles.modalDarkMode : styles.modalLightMode),
+							backgroundColor: colors.background,
+							borderColor: colors.border,
 						}}
 					>
 						<View style={styles.innerContainer}>
@@ -52,9 +55,7 @@ export function CustomModal({
 									<Text
 										style={{
 											...styles.titleText,
-											...(isDarkMode
-												? styles.titleTextDarkMode
-												: styles.titleTextLightMode),
+											color: colors.text,
 										}}
 									>
 										{title}
@@ -91,21 +92,17 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 	},
 	backdropLightMode: {
-		backgroundColor: 'rgba(0,0,0,0.3)',
+		backgroundColor: 'rgba(0,0,0,0.25)',
 	},
 	backdropDarkMode: {
-		backgroundColor: 'rgba(255,255,255,0.3)',
+		backgroundColor: 'rgba(255,255,255,0.25)',
 	},
 	modal: {
 		width: '80%',
 		borderRadius: 20,
 		padding: 10,
-	},
-	modalLightMode: {
-		backgroundColor: 'white',
-	},
-	modalDarkMode: {
-		backgroundColor: 'black',
+		borderWidth: 1,
+		elevation: 6,
 	},
 	innerContainer: {
 		borderRadius: 10,
@@ -119,12 +116,6 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		fontWeight: 'bold',
 		fontSize: 16,
-	},
-	titleTextLightMode: {
-		color: 'rgba(0,0,0,0.55)',
-	},
-	titleTextDarkMode: {
-		color: 'rgba(255,255,255,0.5)',
 	},
 	buttonsContainer: {
 		display: 'flex',

@@ -1,3 +1,4 @@
+import { useTheme } from '@react-navigation/native'
 import { useState } from 'react'
 import { StyleSheet, TextInput, useColorScheme } from 'react-native'
 
@@ -9,10 +10,11 @@ type Props = {
 const MAX_TITLE_LENGTH = 50
 
 export function TaskTitleInput({ initialTitle, onChange }: Props) {
+	const isDarkMode = useColorScheme() === 'dark'
+	const { colors } = useTheme()
 	const [title, setTitle] = useState<string>(
 		initialTitle?.slice(0, MAX_TITLE_LENGTH) ?? ''
 	)
-	const isDarkMode = useColorScheme() === 'dark'
 
 	return (
 		<TextInput
@@ -23,10 +25,11 @@ export function TaskTitleInput({ initialTitle, onChange }: Props) {
 				setTitle(text)
 				onChange(text)
 			}}
-			placeholderTextColor={isDarkMode ? 'rgba(255, 255, 255, 0.35)' : 'rgba(0,0,0,0.45)'}
+			placeholderTextColor={isDarkMode ? 'rgba(255, 255, 255, 0.35)' : 'rgba(0,0,0,0.35)'}
 			style={{
 				...styles.input,
-				...(isDarkMode ? styles.inputColorsDarkMode : styles.inputColorsLightMode),
+				color: colors.text,
+				borderColor: colors.border,
 			}}
 		/>
 	)
@@ -39,13 +42,6 @@ const styles = StyleSheet.create({
 		borderRadius: 8,
 		marginBottom: 12,
 		paddingHorizontal: 10,
-	},
-	inputColorsLightMode: {
-		borderColor: 'rgba(0,0,0,0.3)',
-		color: 'black',
-	},
-	inputColorsDarkMode: {
-		borderColor: 'rgba(255, 255, 255, 0.22)',
-		color: 'white',
+		marginHorizontal: 1,
 	},
 })
