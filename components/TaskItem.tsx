@@ -5,32 +5,14 @@ import { useSecondsTicker } from '@/contexts/SecondsTicker/SecondsTickerContext'
 import { useTaskNotification } from '@/contexts/TaskNotification/TaskNotificationContext'
 import { useTaskStorage } from '@/contexts/TaskStorage/TaskStorageContext'
 import { Task } from '@/types/Task'
-import { TimerDuration } from '@/types/TimerDuration'
-import { convertDurationToSeconds, convertSecondsToDuration } from '@/utils/TimeUtils'
+import { convertDurationToSeconds } from '@/utils/TimeUtils'
 import React, { useEffect, useMemo, useState } from 'react'
-import { StyleSheet, Text, useColorScheme, View } from 'react-native'
+import { StyleSheet, useColorScheme, View } from 'react-native'
+import { TaskItemInfo } from './ui/TaskItemInfo'
 
 type Props = {
 	task: Task
 	onPressEdit: (taskId: number) => void
-}
-
-const getEstimatedTimeText = (timeInSeconds: number): string => {
-	const { hours, minutes, seconds } = convertSecondsToDuration(timeInSeconds)
-
-	return [
-		hours > 0 ? `${hours}h` : '',
-		minutes > 0 ? `${minutes}m` : '',
-		seconds > 0 ? `${seconds}s` : '0s',
-	].join(' ')
-}
-
-const getEstimatedTimeTextFromDuration = (duration: TimerDuration): string => {
-	return [
-		duration.hours > 0 ? `${duration.hours}h` : '',
-		duration.minutes > 0 ? `${duration.minutes}m` : '',
-		duration.seconds > 0 ? `${duration.seconds}s` : '0s',
-	].join(' ')
 }
 
 export function TaskItem({ task, onPressEdit }: Props) {
@@ -70,32 +52,11 @@ export function TaskItem({ task, onPressEdit }: Props) {
 			}}
 		>
 			<View style={styles.content}>
-				<View style={styles.infoWrapper}>
-					<Text
-						style={{
-							...styles.titleText,
-							...(isDarkMode ? styles.textColorDarkMode : styles.textColorLightMode),
-						}}
-					>
-						{task.title}
-					</Text>
-					<Text
-						style={{
-							...styles.subText,
-							...(isDarkMode ? styles.textColorDarkMode : styles.textColorLightMode),
-						}}
-					>
-						Duration: {getEstimatedTimeTextFromDuration(task.duration)}
-					</Text>
-					<Text
-						style={{
-							...styles.subText,
-							...(isDarkMode ? styles.textColorDarkMode : styles.textColorLightMode),
-						}}
-					>
-						Remaining: {getEstimatedTimeText(visualRemainingTimeInSeconds)}
-					</Text>
-				</View>
+				<TaskItemInfo
+					title={task.title}
+					duration={task.duration}
+					remainingTimeInSeconds={visualRemainingTimeInSeconds}
+				/>
 				<View style={styles.controlsWrapper}>
 					<PlayPauseRestartButton
 						isCompleted={isCompleted}
@@ -164,33 +125,11 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 10,
 		paddingVertical: 10,
 	},
-	infoWrapper: {
-		flex: 1,
-		flexShrink: 1,
-		flexDirection: 'column',
-		justifyContent: 'space-between',
-	},
 	controlsWrapper: {
 		flexShrink: 0,
 		flexWrap: 'nowrap',
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		gap: 15,
-	},
-	titleText: {
-		fontSize: 16,
-		fontWeight: '600',
-	},
-	subText: {
-		fontSize: 12,
-		marginTop: 2,
-	},
-	textColorLightMode: {
-		mixBlendMode: 'multiply',
-		color: 'rgba(0, 0, 0, 0.65)',
-	},
-	textColorDarkMode: {
-		mixBlendMode: 'overlay',
-		color: 'rgba(255, 255, 255, 0.9)',
 	},
 })
