@@ -2,18 +2,33 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { TouchableOpacity, useColorScheme, View } from 'react-native'
 
 type Props = {
+	isCompleted: boolean
 	isPlaying: boolean
 	onPressPlay?: () => void
 	onPressPause?: () => void
+	onPressRestart?: () => void
 }
 
-export function PlayPauseButton({ isPlaying, onPressPlay, onPressPause }: Props) {
+export function PlayPauseRestartButton({
+	isCompleted,
+	isPlaying,
+	onPressPlay,
+	onPressPause,
+	onPressRestart,
+}: Props) {
 	const isDarkMode = useColorScheme() === 'dark'
 
 	return (
 		<TouchableOpacity
 			activeOpacity={0.5}
 			onPress={() => {
+				if (isCompleted) {
+					if (onPressRestart) {
+						onPressRestart()
+					}
+					return
+				}
+
 				if (isPlaying && onPressPause) {
 					onPressPause()
 					return
@@ -35,7 +50,7 @@ export function PlayPauseButton({ isPlaying, onPressPlay, onPressPause }: Props)
 				}}
 			>
 				<MaterialCommunityIcons
-					name={isPlaying ? 'pause' : 'play'}
+					name={isCompleted ? 'restart' : isPlaying ? 'pause' : 'play'}
 					size={24}
 					color={isDarkMode ? 'white' : 'black'}
 				/>

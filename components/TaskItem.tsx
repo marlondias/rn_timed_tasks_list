@@ -1,7 +1,6 @@
 import { OptionsMenu } from '@/components/ui/OptionsMenu'
-import { PlayPauseButton } from '@/components/ui/PlayPauseButton'
+import { PlayPauseRestartButton } from '@/components/ui/PlayPauseRestartButton'
 import { ProgressBar } from '@/components/ui/ProgressBar'
-import { RestartButton } from '@/components/ui/RestartButton'
 import { useSecondsTicker } from '@/contexts/SecondsTicker/SecondsTickerContext'
 import { useTaskNotification } from '@/contexts/TaskNotification/TaskNotificationContext'
 import { useTaskStorage } from '@/contexts/TaskStorage/TaskStorageContext'
@@ -98,36 +97,32 @@ export function TaskItem({ task, onPressEdit }: Props) {
 					</Text>
 				</View>
 				<View style={styles.controlsWrapper}>
-					{isCompleted ? (
-						<RestartButton
-							onPress={() => {
-								setVisualRemainingTimeInSeconds(convertDurationToSeconds(task.duration))
+					<PlayPauseRestartButton
+						isCompleted={isCompleted}
+						isPlaying={task.isRunning}
+						onPressPlay={() => {
+							return Promise.all([
+								scheduleTaskAlarmNotification(task),
+								taskStorageService.modify(task.id, { isRunning: true }),
+							])
+						}}
+						onPressPause={() => {
+							return Promise.all([
+								cancelTaskAlarmNotification(task),
 								taskStorageService.modify(task.id, {
 									isRunning: false,
-									remainingTimeInSeconds: convertDurationToSeconds(task.duration),
-								})
-							}}
-						/>
-					) : (
-						<PlayPauseButton
-							isPlaying={task.isRunning}
-							onPressPlay={() => {
-								return Promise.all([
-									scheduleTaskAlarmNotification(task),
-									taskStorageService.modify(task.id, { isRunning: true }),
-								])
-							}}
-							onPressPause={() => {
-								return Promise.all([
-									cancelTaskAlarmNotification(task),
-									taskStorageService.modify(task.id, {
-										isRunning: false,
-										remainingTimeInSeconds: visualRemainingTimeInSeconds,
-									}),
-								])
-							}}
-						/>
-					)}
+									remainingTimeInSeconds: visualRemainingTimeInSeconds,
+								}),
+							])
+						}}
+						onPressRestart={() => {
+							setVisualRemainingTimeInSeconds(convertDurationToSeconds(task.duration))
+							taskStorageService.modify(task.id, {
+								isRunning: false,
+								remainingTimeInSeconds: convertDurationToSeconds(task.duration),
+							})
+						}}
+					/>
 
 					<OptionsMenu
 						allowEdit={!task.isRunning}
