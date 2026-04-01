@@ -9,7 +9,9 @@
 
 ## Problemas
 
-- Após editar, valor de "remaining" não acompanha o novo "duration".
+- ⚠️ Quando uma tarefa é concluida, causa atualização do array de Tasks, causando reset do "visualRemaining". Porém a notificação toca no momento certo.
+- Problema grave relacionado à forma de contar o tempo restante. Deveria ser setadas duas Dates e feito comparação entre elas para obter o remainingTimeInSeconds.
+
 - Melhorar o SecondsTicker, pode ter time drift.
 
 ## Obs
