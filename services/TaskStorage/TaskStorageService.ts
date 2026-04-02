@@ -9,13 +9,21 @@ class TaskStorageService {
 
 	public async add(title: string, duration: TimerDuration): Promise<void> {
 		const newTask = this.getNewTask(title, duration)
-		await this.database.insertTask(newTask).then(() => this.triggerMutation())
+
+		await this.database
+			.insertTask(newTask)
+			.then(() => this.triggerMutation())
+			.catch((error) => this.logError('Failed to add a task.', error))
 	}
 
 	public async duplicate(taskId: number): Promise<void> {
 		const existingTask = this.get(taskId)
 		const newTask = this.getNewTask(existingTask.title, existingTask.duration)
-		await this.database.insertTask(newTask).then(() => this.triggerMutation())
+
+		await this.database
+			.insertTask(newTask)
+			.then(() => this.triggerMutation())
+			.catch((error) => this.logError('Failed to duplicate a task.', error))
 	}
 
 	public async modify(taskId: number, changes: TaskModifiableProps): Promise<void> {
@@ -34,13 +42,17 @@ class TaskStorageService {
 			})
 		}
 
-		await this.database.updateTask(oldTask.id, changes)
-
-		await this.triggerMutation()
+		await this.database
+			.updateTask(oldTask.id, changes)
+			.then(() => this.triggerMutation())
+			.catch((error) => this.logError('Failed to modify a task.', error))
 	}
 
 	public async remove(taskId: number): Promise<void> {
-		await this.database.deleteTask(taskId).then(() => this.triggerMutation())
+		await this.database
+			.deleteTask(taskId)
+			.then(() => this.triggerMutation())
+			.catch((error) => this.logError('Failed to remove a task.', error))
 	}
 
 	public get(taskId: number): Task {
@@ -56,11 +68,24 @@ class TaskStorageService {
 	}
 
 	public async triggerMutation(): Promise<void> {
-		this.tasks = await this.database.getTasks()
+		this.tasks = await this.fetchAll()
 
 		if (this.onDataMutation) {
 			this.onDataMutation()
 		}
+	}
+
+	private async fetchAll(): Promise<Task[]> {
+		try {
+			return await this.database.getTasks()
+		} catch (error) {
+			this.logError('Failed to fetch all tasks.', error)
+			return []
+		}
+	}
+
+	private logError(message: string, error: any): void {
+		console.error({ message, error })
 	}
 
 	private getNewTask(title: string, duration: TimerDuration): Task {
