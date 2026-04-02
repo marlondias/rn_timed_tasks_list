@@ -1,6 +1,5 @@
 import { Task, TaskModifiableProps } from '@/types/Task'
 import { TimerDuration } from '@/types/TimerDuration'
-import { convertDurationToSeconds } from '@/utils/TimeUtils'
 import { TaskStorageDatabase } from './TaskStorageDatabase'
 
 class TaskStorageService {
@@ -19,24 +18,26 @@ class TaskStorageService {
 		await this.database.insertTask(newTask).then(() => this.triggerMutation())
 	}
 
-	public async modify(taskId: number, modifiedTask: TaskModifiableProps): Promise<void> {
+	public async modify(taskId: number, changes: TaskModifiableProps): Promise<void> {
 		const oldTask = this.get(taskId)
-		const newTask: Task = { ...oldTask }
 
-		if (modifiedTask.title !== undefined) {
-			newTask.title = modifiedTask.title
-		}
-		if (modifiedTask.duration !== undefined) {
-			newTask.duration = modifiedTask.duration
-		}
-		if (modifiedTask.isRunning !== undefined) {
-			newTask.isRunning = modifiedTask.isRunning
-		}
-		if (modifiedTask.remainingTimeInSeconds !== undefined) {
-			newTask.remainingTimeInSeconds = modifiedTask.remainingTimeInSeconds
+		const durationChanged = changes.duration && changes.duration !== oldTask.duration
+		const isRunningChanged =
+			changes.isRunning !== undefined && changes.isRunning !== oldTask.isRunning
+
+		if (durationChanged) {
+			changes.isRunning = false
+			await this.database.deleteTaskRuntimeStates(oldTask.id)
+		} else if (isRunningChanged) {
+			this.database.insertTaskRuntimeState(taskId, {
+				change: changes.isRunning ? 'resumed' : 'paused',
+				happenedAt: new Date(),
+			})
 		}
 
-		await this.database.updateTask(newTask).then(() => this.triggerMutation())
+		await this.database.updateTask(oldTask.id, changes)
+
+		await this.triggerMutation()
 	}
 
 	public async remove(taskId: number): Promise<void> {
@@ -64,15 +65,13 @@ class TaskStorageService {
 	}
 
 	private getNewTask(title: string, duration: TimerDuration): Task {
-		const durationInSeconds = convertDurationToSeconds(duration)
-
 		return {
 			id: Number.NaN,
+			createdAt: new Date(),
 			title,
 			duration,
-			createdAt: new Date(),
 			isRunning: false,
-			remainingTimeInSeconds: durationInSeconds,
+			runtimeStates: [],
 		}
 	}
 }
