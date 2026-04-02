@@ -1,6 +1,7 @@
 import { CustomModal } from '@/components/ui/CustomModal'
 import { TaskTimerPicker } from '@/components/ui/TaskTimerPicker'
 import { TaskTitleInput } from '@/components/ui/TaskTitleInput'
+import { useTaskStorage } from '@/contexts/TaskStorage/TaskStorageContext'
 import { getZeroDuration, TimerDuration } from '@/types/TimerDuration'
 import { isDurationZero } from '@/utils/TimeUtils'
 import { useEffect, useMemo, useState } from 'react'
@@ -9,10 +10,10 @@ import { View } from 'react-native'
 type Props = {
 	isVisible: boolean
 	setIsVisible: (newState: boolean) => void
-	onConfirmCreation: (title: string, duration: TimerDuration) => void
 }
 
-export function CreateTaskModal({ isVisible, setIsVisible, onConfirmCreation }: Props) {
+export function CreateTaskModal({ isVisible, setIsVisible }: Props) {
+	const { taskStorageService } = useTaskStorage()
 	const [title, setTitle] = useState<string>('')
 	const [duration, setDuration] = useState<TimerDuration>(getZeroDuration())
 	const isValidForCreation: boolean = useMemo(
@@ -40,10 +41,9 @@ export function CreateTaskModal({ isVisible, setIsVisible, onConfirmCreation }: 
 				{
 					title: 'Create',
 					color: '#47ad46',
-					onPress: () => {
+					onPress: async () => {
 						if (!isValidForCreation) return
-						onConfirmCreation(title.trim(), duration)
-						setIsVisible(false)
+						taskStorageService.add(title, duration).then(() => setIsVisible(false))
 					},
 				},
 			]}

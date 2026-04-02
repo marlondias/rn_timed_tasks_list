@@ -1,13 +1,11 @@
 import { CreateTaskModal } from '@/components/CreateTaskModal'
 import { TaskList } from '@/components/TaskList'
 import { AddTaskButton } from '@/components/ui/AddTaskButton'
-import { useTaskStorage } from '@/contexts/TaskStorage/TaskStorageContext'
 import { useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function Index() {
-	const { taskStorageService } = useTaskStorage()
 	const [isCreationModalVisible, setIsCreationModalVisible] = useState(false)
 
 	return (
@@ -18,9 +16,6 @@ export default function Index() {
 				<CreateTaskModal
 					isVisible={isCreationModalVisible}
 					setIsVisible={setIsCreationModalVisible}
-					onConfirmCreation={(title, duration) => {
-						taskStorageService.add(title, duration)
-					}}
 				/>
 
 				<View style={styles.buttonOverlay}>
