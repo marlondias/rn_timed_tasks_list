@@ -18,18 +18,14 @@ type TaskRuntimeStateRow = {
 	created_at: string
 }
 
-const sqliteFilename = 'tasks.db'
-
 export class TaskStorageDatabase {
-	private readonly db: SQLite.SQLiteDatabase
-
-	constructor() {
-		this.db = SQLite.openDatabaseSync(sqliteFilename)
-		this.createTables()
-	}
+	private readonly sqliteFilename = 'tasks.db'
+	private db?: SQLite.SQLiteDatabase
 
 	public async insertTask(task: Task): Promise<void> {
-		await this.db.runAsync(
+		const db = await this.getDb()
+
+		await db.runAsync(
 			`INSERT INTO tasks (
 				title,
 				duration_hours,
@@ -51,7 +47,8 @@ export class TaskStorageDatabase {
 		taskId: number,
 		runtimeState: TaskRuntimeState
 	): Promise<void> {
-		await this.db.runAsync(
+		const db = await this.getDb()
+		await db.runAsync(
 			`INSERT INTO task_runtime_states (
 				task_id,
 				change_type,
@@ -62,7 +59,8 @@ export class TaskStorageDatabase {
 	}
 
 	public async updateTask(taskId: number, changes: TaskModifiableProps): Promise<void> {
-		await this.db.runAsync(
+		const db = await this.getDb()
+		await db.runAsync(
 			`
 				UPDATE tasks
 				SET
@@ -83,21 +81,24 @@ export class TaskStorageDatabase {
 	}
 
 	public async deleteTask(taskId: number): Promise<void> {
-		await this.db.runAsync('DELETE FROM tasks WHERE id = ?', [taskId])
+		const db = await this.getDb()
+		await db.runAsync('DELETE FROM tasks WHERE id = ?', [taskId])
 	}
 
 	public async deleteTaskRuntimeStates(taskId: number): Promise<void> {
-		await this.db.runAsync('DELETE FROM task_runtime_states WHERE task_id = ?', [taskId])
+		const db = await this.getDb()
+		await db.runAsync('DELETE FROM task_runtime_states WHERE task_id = ?', [taskId])
 	}
 
 	public async getTasks(): Promise<Task[]> {
-		const taskRows = await this.db.getAllAsync<TaskRow>(`
+		const db = await this.getDb()
+		const taskRows = await db.getAllAsync<TaskRow>(`
 			SELECT *
 			FROM tasks
 			ORDER BY created_at
 		`)
 
-		const runtimeStateRows = await this.db.getAllAsync<TaskRuntimeStateRow>(`
+		const runtimeStateRows = await db.getAllAsync<TaskRuntimeStateRow>(`
 			SELECT *
 			FROM task_runtime_states
 			ORDER BY created_at
@@ -131,7 +132,11 @@ export class TaskStorageDatabase {
 		})
 	}
 
-	private async createTables() {
+	private async getDb(): Promise<SQLite.SQLiteDatabase> {
+		if (!!this.db) return this.db
+
+		this.db = await SQLite.openDatabaseAsync(this.sqliteFilename)
+
 		await this.db.execAsync(`
 			PRAGMA foreign_keys = ON;
 
@@ -154,5 +159,7 @@ export class TaskStorageDatabase {
 					ON DELETE CASCADE
       );
     `)
+
+		return this.db
 	}
 }
