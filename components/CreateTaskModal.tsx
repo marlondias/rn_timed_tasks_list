@@ -41,7 +41,7 @@ export function CreateTaskModal({ isVisible, setIsVisible }: Props) {
 				{
 					title: 'Create',
 					color: '#47ad46',
-					onPress: async () => {
+					onPress: () => {
 						if (!isValidForCreation) return
 						taskStorageService.add(title, duration).then(() => setIsVisible(false))
 					},
