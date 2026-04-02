@@ -1,5 +1,6 @@
 import { TaskNotificationContext } from '@/contexts/TaskNotification/TaskNotificationContext'
 import { Task } from '@/types/Task'
+import { getRemainingTimeInSeconds } from '@/utils/TaskRuntimeUtils'
 import {
 	AndroidImportance,
 	cancelScheduledNotificationAsync,
@@ -73,7 +74,7 @@ export function TaskNotificationProvider({ children }: PropsWithChildren) {
 			},
 			trigger: {
 				type: SchedulableTriggerInputTypes.TIME_INTERVAL,
-				seconds: task.remainingTimeInSeconds,
+				seconds: getRemainingTimeInSeconds(task),
 				channelId: 'alarms',
 			},
 		}

@@ -1,8 +1,7 @@
 import { EditTaskModal } from '@/components/EditTaskModal'
 import { TaskItem } from '@/components/TaskItem'
 import { useTaskStorage } from '@/contexts/TaskStorage/TaskStorageContext'
-import { Task, TaskModifiableProps } from '@/types/Task'
-import { convertDurationToSeconds } from '@/utils/TimeUtils'
+import { Task } from '@/types/Task'
 import { useState } from 'react'
 import { ScrollView, StyleSheet, View } from 'react-native'
 
@@ -20,14 +19,10 @@ export function TaskList() {
 					initialTitle={taskBeingEdited.title}
 					initialDuration={taskBeingEdited.duration}
 					onConfirmEditing={(title, duration) => {
-						const newTaskProps: TaskModifiableProps = { title }
-
-						if (taskBeingEdited.duration !== duration) {
-							newTaskProps.duration = duration
-							newTaskProps.remainingTimeInSeconds = convertDurationToSeconds(duration)
-						}
-
-						taskStorageService.modify(taskBeingEdited.id, newTaskProps)
+						taskStorageService.modify(taskBeingEdited.id, {
+							title,
+							duration: taskBeingEdited.duration !== duration ? duration : undefined,
+						})
 						setTaskBeingEdited(undefined)
 					}}
 				/>

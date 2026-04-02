@@ -5,6 +5,7 @@ import { useSecondsTicker } from '@/contexts/SecondsTicker/SecondsTickerContext'
 import { useTaskNotification } from '@/contexts/TaskNotification/TaskNotificationContext'
 import { useTaskStorage } from '@/contexts/TaskStorage/TaskStorageContext'
 import { Task } from '@/types/Task'
+import { getRemainingTimeInSeconds } from '@/utils/TaskRuntimeUtils'
 import { convertDurationToSeconds } from '@/utils/TimeUtils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { StyleSheet, useColorScheme, View } from 'react-native'
@@ -21,28 +22,28 @@ export function TaskItem({ task, onPressEdit }: Props) {
 	const { taskStorageService } = useTaskStorage()
 	const { scheduleTaskAlarmNotification, cancelTaskAlarmNotification } =
 		useTaskNotification()
-	const [visualRemainingTimeInSeconds, setVisualRemainingTimeInSeconds] =
-		useState<number>(task.remainingTimeInSeconds)
 
-	const isCompleted = useMemo(
-		(): boolean => !task.isRunning && task.remainingTimeInSeconds === 0,
+	const durationInSeconds = useMemo(
+		(): number => convertDurationToSeconds(task.duration),
 		[task]
+	)
+	const [remainingTimeInSeconds, setRemainingTimeInSeconds] = useState<number>(Number.NaN)
+	const isCompleted = useMemo(
+		(): boolean => !task.isRunning && remainingTimeInSeconds === 0,
+		[remainingTimeInSeconds, task]
 	)
 
 	useEffect(() => {
 		if (!task.isRunning) return
 
-		if (visualRemainingTimeInSeconds < 1) {
-			taskStorageService.modify(task.id, { isRunning: false, remainingTimeInSeconds: 0 })
-			return
-		}
-
-		setVisualRemainingTimeInSeconds((prev) => prev - 1)
-	}, [currentTick])
-
-	useEffect(() => {
-		setVisualRemainingTimeInSeconds(task.remainingTimeInSeconds)
-	}, [task])
+		setRemainingTimeInSeconds((prev): number => {
+			const next = getRemainingTimeInSeconds(task)
+			if (next < 1) {
+				taskStorageService.modify(task.id, { isRunning: false })
+			}
+			return next
+		})
+	}, [currentTick, task])
 
 	return (
 		<View
@@ -55,7 +56,7 @@ export function TaskItem({ task, onPressEdit }: Props) {
 				<TaskItemInfo
 					title={task.title}
 					duration={task.duration}
-					remainingTimeInSeconds={visualRemainingTimeInSeconds}
+					remainingTimeInSeconds={remainingTimeInSeconds}
 				/>
 				<View style={styles.controlsWrapper}>
 					<PlayPauseRestartButton
@@ -70,32 +71,26 @@ export function TaskItem({ task, onPressEdit }: Props) {
 						onPressPause={() => {
 							return Promise.all([
 								cancelTaskAlarmNotification(task),
-								taskStorageService.modify(task.id, {
-									isRunning: false,
-									remainingTimeInSeconds: visualRemainingTimeInSeconds,
-								}),
+								taskStorageService.modify(task.id, { isRunning: false }),
 							])
 						}}
 						onPressRestart={() => {
-							setVisualRemainingTimeInSeconds(convertDurationToSeconds(task.duration))
-							taskStorageService.modify(task.id, {
-								isRunning: false,
-								remainingTimeInSeconds: convertDurationToSeconds(task.duration),
-							})
+							setRemainingTimeInSeconds(getRemainingTimeInSeconds(task))
+							taskStorageService.modify(task.id, { duration: task.duration })
 						}}
 					/>
 
 					<OptionsMenu
 						allowEdit={!task.isRunning}
 						onPressEdit={() => onPressEdit(task.id)}
-						onPressDuplicate={async () => await taskStorageService.duplicate(task.id)}
-						onPressRemove={async () => await taskStorageService.remove(task.id)}
+						onPressDuplicate={() => taskStorageService.duplicate(task.id)}
+						onPressRemove={() => taskStorageService.remove(task.id)}
 					/>
 				</View>
 			</View>
 			<ProgressBar
-				currentValue={visualRemainingTimeInSeconds}
-				totalValue={convertDurationToSeconds(task.duration)}
+				currentValue={remainingTimeInSeconds}
+				totalValue={durationInSeconds}
 				height={5}
 			/>
 		</View>
