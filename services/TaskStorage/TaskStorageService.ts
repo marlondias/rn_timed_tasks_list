@@ -28,15 +28,16 @@ class TaskStorageService {
 
 	public async modify(taskId: number, changes: TaskModifiableProps): Promise<void> {
 		const oldTask = this.get(taskId)
-
+		const durationChanged = changes.duration !== undefined
 		const isRunningChanged =
 			changes.isRunning !== undefined && changes.isRunning !== oldTask.isRunning
 
-		if (changes.duration !== undefined) {
-			changes.isRunning = false
+		if (durationChanged) {
 			await this.database.deleteTaskRuntimeStates(oldTask.id)
-		} else if (isRunningChanged) {
-			this.database.insertTaskRuntimeState(taskId, {
+		}
+
+		if (isRunningChanged && !durationChanged) {
+			this.database.insertTaskRuntimeState(oldTask.id, {
 				change: changes.isRunning ? 'resumed' : 'paused',
 				happenedAt: new Date(),
 			})
