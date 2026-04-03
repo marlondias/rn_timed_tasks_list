@@ -15,8 +15,7 @@ type Props = {
 export function TaskItem({ task }: Props) {
 	const { taskStorageService } = useTaskStorage()
 	const { currentTick } = useSecondsTicker()
-	const { scheduleTaskAlarmNotification, cancelTaskAlarmNotification } =
-		useTaskNotification()
+	const { scheduleAlarmNotification, cancelAlarmNotification } = useTaskNotification()
 	const [isEditModalVisible, setIsEditModalVisible] = useState(false)
 	const [remainingTimeInSeconds, setRemainingTimeInSeconds] = useState(Number.NaN)
 

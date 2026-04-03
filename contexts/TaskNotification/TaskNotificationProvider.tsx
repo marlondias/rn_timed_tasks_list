@@ -95,9 +95,8 @@ export function TaskNotificationProvider({ children }: PropsWithChildren) {
 			value={{
 				sendImmediateNotification: (content) =>
 					sendNotification({ content, trigger: null }),
-				scheduleTaskAlarmNotification: (task) =>
-					sendNotification(getRequestFromTask(task)),
-				cancelTaskAlarmNotification: (task) =>
+				scheduleAlarmNotification: (task) => sendNotification(getRequestFromTask(task)),
+				cancelAlarmNotification: (task) =>
 					cancelScheduledNotificationAsync(getIdentifierFromTask(task)),
 			}}
 		>

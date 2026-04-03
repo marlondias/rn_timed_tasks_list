@@ -4,8 +4,8 @@ import { createContext, useContext } from 'react'
 
 type TaskNotificationContextType = {
 	sendImmediateNotification: (content: NotificationContentInput) => Promise<void>
-	scheduleTaskAlarmNotification: (task: Task) => Promise<void>
-	cancelTaskAlarmNotification: (task: Task) => Promise<void>
+	scheduleAlarmNotification: (task: Task) => Promise<void>
+	cancelAlarmNotification: (task: Task) => Promise<void>
 }
 
 const TaskNotificationContext = createContext<TaskNotificationContextType | null>(null)
