@@ -2,6 +2,7 @@ import { useSecondsTicker } from '@/contexts/SecondsTicker/SecondsTickerContext'
 import { useTaskNotification } from '@/contexts/TaskNotification/TaskNotificationContext'
 import { useTaskStorage } from '@/contexts/TaskStorage/TaskStorageContext'
 import { Task } from '@/types/Task'
+import { getRemainingTimeInSeconds } from '@/utils/TaskRuntimeUtils'
 import { convertDurationToSeconds } from '@/utils/TimeUtils'
 import React, { useEffect, useState } from 'react'
 import { EditTaskModal } from './EditTaskModal'
@@ -12,26 +13,29 @@ type Props = {
 }
 
 export function TaskItem({ task }: Props) {
-	const { currentTick } = useSecondsTicker()
 	const { taskStorageService } = useTaskStorage()
+	const { currentTick } = useSecondsTicker()
 	const { scheduleTaskAlarmNotification, cancelTaskAlarmNotification } =
 		useTaskNotification()
-
-	const [remainingTimeInSeconds, setRemainingTimeInSeconds] = useState<number>(Number.NaN)
 	const [isEditModalVisible, setIsEditModalVisible] = useState(false)
+	const [remainingTimeInSeconds, setRemainingTimeInSeconds] = useState(Number.NaN)
+
+	useEffect(() => {
+		setIsEditModalVisible(false)
+		setRemainingTimeInSeconds(getRemainingTimeInSeconds(task))
+	}, [task])
 
 	useEffect(() => {
 		if (!task.isRunning) return
 
-		setRemainingTimeInSeconds((prev) => {
-			const next = prev - 1
-			if (next < 1) {
+		setRemainingTimeInSeconds((prev): number => {
+			const next = getRemainingTimeInSeconds(task)
+			if (next <= 0) {
 				taskStorageService.modify(task.id, { isRunning: false })
-				return prev
 			}
 			return next
 		})
-	}, [currentTick])
+	}, [taskStorageService, task, currentTick])
 
 	return (
 		<>
@@ -40,35 +44,28 @@ export function TaskItem({ task }: Props) {
 				duration={task.duration}
 				remainingTimeInSeconds={remainingTimeInSeconds}
 				isRunning={task.isRunning}
-				isCompleted={!task.isRunning && remainingTimeInSeconds < 1}
+				isCompleted={!task.isRunning && remainingTimeInSeconds === 0}
 				onPressPlay={() => {
-					return Promise.all([
+					taskStorageService.modify(task.id, { isRunning: true }).then(() => {
+						console.log('modificou para PLAY')
 						// scheduleTaskAlarmNotification(task),
-						taskStorageService.modify(task.id, { isRunning: true }),
-					])
+					})
 				}}
 				onPressPause={() => {
-					return Promise.all([
+					taskStorageService.modify(task.id, { isRunning: false }).then(() => {
+						console.log('modificou para PAUSE')
 						// cancelTaskAlarmNotification(task),
-						taskStorageService.modify(task.id, { isRunning: false }),
-					])
+					})
 				}}
 				onPressRestart={() => {
-					setRemainingTimeInSeconds(convertDurationToSeconds(task.duration))
 					taskStorageService.modify(task.id, {
 						duration: task.duration,
 						isRunning: false,
 					})
 				}}
-				onPressEdit={() => {
-					setIsEditModalVisible(true)
-				}}
-				onPressDuplicate={() => {
-					taskStorageService.duplicate(task.id)
-				}}
-				onPressRemove={() => {
-					taskStorageService.remove(task.id)
-				}}
+				onPressEdit={() => setIsEditModalVisible(true)}
+				onPressDuplicate={() => taskStorageService.duplicate(task.id)}
+				onPressRemove={() => taskStorageService.remove(task.id)}
 			/>
 
 			{!task.isRunning && (
@@ -86,6 +83,7 @@ export function TaskItem({ task }: Props) {
 						taskStorageService.modify(task.id, {
 							title,
 							duration: isChangingDuration ? duration : undefined,
+							isRunning: false,
 						})
 					}}
 				/>
