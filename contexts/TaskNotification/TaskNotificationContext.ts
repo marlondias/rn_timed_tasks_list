@@ -1,11 +1,10 @@
-import { Task } from '@/types/Task'
 import { NotificationContentInput } from 'expo-notifications'
 import { createContext, useContext } from 'react'
 
 type TaskNotificationContextType = {
 	sendImmediateNotification: (content: NotificationContentInput) => Promise<void>
-	scheduleTaskAlarmNotification: (task: Task) => Promise<void>
-	cancelTaskAlarmNotification: (task: Task) => Promise<void>
+	scheduleAlarmNotification: (taskId: number) => Promise<void>
+	cancelAlarmNotification: (taskId: number) => Promise<void>
 }
 
 const TaskNotificationContext = createContext<TaskNotificationContextType | null>(null)

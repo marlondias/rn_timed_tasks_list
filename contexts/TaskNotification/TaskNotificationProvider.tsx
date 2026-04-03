@@ -1,5 +1,6 @@
 import { TaskNotificationContext } from '@/contexts/TaskNotification/TaskNotificationContext'
-import { Task } from '@/types/Task'
+import { useTaskStorage } from '@/contexts/TaskStorage/TaskStorageContext'
+import { getRemainingTimeInSeconds } from '@/utils/TaskRuntimeUtils'
 import {
 	AndroidImportance,
 	cancelScheduledNotificationAsync,
@@ -25,6 +26,8 @@ setNotificationHandler({
 })
 
 export function TaskNotificationProvider({ children }: PropsWithChildren) {
+	const { taskStorageService } = useTaskStorage()
+
 	const requestPermissions = async (): Promise<void> => {
 		const permissionStatus = await getPermissionsAsync()
 		if (permissionStatus.granted) return
@@ -59,21 +62,23 @@ export function TaskNotificationProvider({ children }: PropsWithChildren) {
 		await scheduleNotificationAsync({ ...request })
 	}
 
-	const getIdentifierFromTask = (task: Task): string => {
-		return `task_${task.id}_alarm`
+	const getIdentifierFromTask = (taskId: number): string => {
+		return `task_alarm_${taskId}`
 	}
 
-	const getRequestFromTask = (task: Task): NotificationRequestInput => {
+	const getRequestFromTask = (taskId: number): NotificationRequestInput => {
+		const task = taskStorageService.get(taskId)
+
 		return {
-			identifier: getIdentifierFromTask(task),
+			identifier: getIdentifierFromTask(task.id),
 			content: {
 				title: 'Task Alarm',
 				body: `Your task "${task.title}" is done!`,
 				interruptionLevel: 'timeSensitive',
 			},
 			trigger: {
-				type: SchedulableTriggerInputTypes.TIME_INTERVAL,
-				seconds: task.remainingTimeInSeconds,
+				type: SchedulableTriggerInputTypes.DATE,
+				date: new Date(Date.now() + getRemainingTimeInSeconds(task) * 1000),
 				channelId: 'alarms',
 			},
 		}
@@ -94,10 +99,12 @@ export function TaskNotificationProvider({ children }: PropsWithChildren) {
 			value={{
 				sendImmediateNotification: (content) =>
 					sendNotification({ content, trigger: null }),
-				scheduleTaskAlarmNotification: (task) =>
-					sendNotification(getRequestFromTask(task)),
-				cancelTaskAlarmNotification: (task) =>
-					cancelScheduledNotificationAsync(getIdentifierFromTask(task)),
+
+				scheduleAlarmNotification: (taskId) =>
+					sendNotification(getRequestFromTask(taskId)),
+
+				cancelAlarmNotification: (taskId) =>
+					cancelScheduledNotificationAsync(getIdentifierFromTask(taskId)),
 			}}
 		>
 			{children}

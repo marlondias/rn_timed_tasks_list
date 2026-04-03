@@ -1,6 +1,5 @@
 import { Task, TaskModifiableProps } from '@/types/Task'
 import { TimerDuration } from '@/types/TimerDuration'
-import { convertDurationToSeconds } from '@/utils/TimeUtils'
 import { TaskStorageDatabase } from './TaskStorageDatabase'
 
 class TaskStorageService {
@@ -10,37 +9,51 @@ class TaskStorageService {
 
 	public async add(title: string, duration: TimerDuration): Promise<void> {
 		const newTask = this.getNewTask(title, duration)
-		await this.database.insertTask(newTask).then(() => this.triggerMutation())
+
+		await this.database
+			.insertTask(newTask)
+			.then(() => this.triggerMutation())
+			.catch((error) => this.logError('Failed to add a task.', error))
 	}
 
 	public async duplicate(taskId: number): Promise<void> {
 		const existingTask = this.get(taskId)
 		const newTask = this.getNewTask(existingTask.title, existingTask.duration)
-		await this.database.insertTask(newTask).then(() => this.triggerMutation())
+
+		await this.database
+			.insertTask(newTask)
+			.then(() => this.triggerMutation())
+			.catch((error) => this.logError('Failed to duplicate a task.', error))
 	}
 
-	public async modify(taskId: number, modifiedTask: TaskModifiableProps): Promise<void> {
+	public async modify(taskId: number, changes: TaskModifiableProps): Promise<void> {
 		const oldTask = this.get(taskId)
-		const newTask: Task = { ...oldTask }
+		const durationChanged = changes.duration !== undefined
+		const isRunningChanged =
+			changes.isRunning !== undefined && changes.isRunning !== oldTask.isRunning
 
-		if (modifiedTask.title !== undefined) {
-			newTask.title = modifiedTask.title
+		try {
+			if (durationChanged) {
+				await this.database.deleteTaskRuntimeStates(oldTask.id)
+			}
+			if (isRunningChanged && !durationChanged) {
+				await this.database.insertTaskRuntimeState(oldTask.id, {
+					change: changes.isRunning ? 'resumed' : 'paused',
+					happenedAt: new Date(),
+				})
+			}
+			await this.database.updateTask(oldTask.id, changes)
+			await this.triggerMutation()
+		} catch (error) {
+			this.logError('Failed to modify a task.', error)
 		}
-		if (modifiedTask.duration !== undefined) {
-			newTask.duration = modifiedTask.duration
-		}
-		if (modifiedTask.isRunning !== undefined) {
-			newTask.isRunning = modifiedTask.isRunning
-		}
-		if (modifiedTask.remainingTimeInSeconds !== undefined) {
-			newTask.remainingTimeInSeconds = modifiedTask.remainingTimeInSeconds
-		}
-
-		await this.database.updateTask(newTask).then(() => this.triggerMutation())
 	}
 
 	public async remove(taskId: number): Promise<void> {
-		await this.database.deleteTask(taskId).then(() => this.triggerMutation())
+		await this.database
+			.deleteTask(taskId)
+			.then(() => this.triggerMutation())
+			.catch((error) => this.logError('Failed to remove a task.', error))
 	}
 
 	public get(taskId: number): Task {
@@ -56,23 +69,34 @@ class TaskStorageService {
 	}
 
 	public async triggerMutation(): Promise<void> {
-		this.tasks = await this.database.getTasks()
+		this.tasks = await this.fetchAll()
 
 		if (this.onDataMutation) {
 			this.onDataMutation()
 		}
 	}
 
-	private getNewTask(title: string, duration: TimerDuration): Task {
-		const durationInSeconds = convertDurationToSeconds(duration)
+	private async fetchAll(): Promise<Task[]> {
+		try {
+			return await this.database.getTasks()
+		} catch (error) {
+			this.logError('Failed to fetch all tasks.', error)
+			return []
+		}
+	}
 
+	private logError(message: string, error: any): void {
+		console.error({ message, error })
+	}
+
+	private getNewTask(title: string, duration: TimerDuration): Task {
 		return {
 			id: Number.NaN,
+			createdAt: new Date(),
 			title,
 			duration,
-			createdAt: new Date(),
 			isRunning: false,
-			remainingTimeInSeconds: durationInSeconds,
+			runtimeStates: [],
 		}
 	}
 }

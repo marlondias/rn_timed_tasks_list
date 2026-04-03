@@ -1,4 +1,5 @@
-import { Task } from '@/types/Task'
+import { Task, TaskModifiableProps } from '@/types/Task'
+import { StateChange, TaskRuntimeState } from '@/types/TaskRuntimeState'
 import * as SQLite from 'expo-sqlite'
 
 type TaskRow = {
@@ -7,106 +8,158 @@ type TaskRow = {
 	duration_hours: number
 	duration_minutes: number
 	duration_seconds: number
-	remaining_time_in_seconds: number
-	is_running: number
 	created_at: string
 }
 
-const sqliteFilename = 'tasks.db'
+type TaskRuntimeStateRow = {
+	id: number
+	task_id: number
+	change_type: string
+	created_at: string
+}
 
 export class TaskStorageDatabase {
-	private readonly db: SQLite.SQLiteDatabase
-
-	constructor() {
-		this.db = SQLite.openDatabaseSync(sqliteFilename)
-		this.createTable()
-	}
+	private readonly sqliteFilename = 'tasks.db'
+	private db?: SQLite.SQLiteDatabase
 
 	public async insertTask(task: Task): Promise<void> {
-		await this.db.runAsync(
+		const db = await this.getDb()
+
+		await db.runAsync(
 			`INSERT INTO tasks (
 				title,
 				duration_hours,
 				duration_minutes,
 				duration_seconds,
-				remaining_time_in_seconds,
-				is_running,
 				created_at
-			) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+			) VALUES (?, ?, ?, ?, ?)`,
 			[
 				task.title,
 				task.duration.hours,
 				task.duration.minutes,
 				task.duration.seconds,
-				task.remainingTimeInSeconds,
-				task.isRunning ? 1 : 0,
 				task.createdAt.toISOString(),
 			]
 		)
 	}
 
-	public async updateTask(task: Task): Promise<void> {
-		await this.db.runAsync(
+	public async insertTaskRuntimeState(
+		taskId: number,
+		runtimeState: TaskRuntimeState
+	): Promise<void> {
+		const db = await this.getDb()
+		await db.runAsync(
+			`INSERT INTO task_runtime_states (
+				task_id,
+				change_type,
+				created_at
+			) VALUES (?, ?, ?)`,
+			[taskId, runtimeState.change, runtimeState.happenedAt.toISOString()]
+		)
+	}
+
+	public async updateTask(taskId: number, changes: TaskModifiableProps): Promise<void> {
+		const db = await this.getDb()
+		await db.runAsync(
 			`
 				UPDATE tasks
 				SET
-					title = ?,
-					duration_hours = ?,
-					duration_minutes = ?,
-					duration_seconds = ?,
-					remaining_time_in_seconds = ?,
-					is_running = ?,
-					created_at = ?
+					title = COALESCE(?, title),
+					duration_hours = COALESCE(?, duration_hours),
+					duration_minutes = COALESCE(?, duration_minutes),
+					duration_seconds = COALESCE(?, duration_seconds)
 				WHERE id = ?
 			`,
 			[
-				task.title,
-				task.duration.hours,
-				task.duration.minutes,
-				task.duration.seconds,
-				task.remainingTimeInSeconds,
-				task.isRunning ? 1 : 0,
-				task.createdAt.toISOString(),
-				task.id,
+				changes.title ?? null,
+				changes.duration?.hours ?? null,
+				changes.duration?.minutes ?? null,
+				changes.duration?.seconds ?? null,
+				taskId,
 			]
 		)
 	}
 
 	public async deleteTask(taskId: number): Promise<void> {
-		await this.db.runAsync('DELETE FROM tasks WHERE id = ?', [taskId])
+		const db = await this.getDb()
+		await db.runAsync('DELETE FROM tasks WHERE id = ?', [taskId])
+	}
+
+	public async deleteTaskRuntimeStates(taskId: number): Promise<void> {
+		const db = await this.getDb()
+		await db.runAsync('DELETE FROM task_runtime_states WHERE task_id = ?', [taskId])
 	}
 
 	public async getTasks(): Promise<Task[]> {
-		const rows = await this.db.getAllAsync<TaskRow>('SELECT * FROM tasks ORDER BY id')
+		const db = await this.getDb()
+		const taskRows = await db.getAllAsync<TaskRow>(`
+			SELECT *
+			FROM tasks
+			ORDER BY created_at
+		`)
 
-		return rows.map((row) => {
+		const runtimeStateRows = await db.getAllAsync<TaskRuntimeStateRow>(`
+			SELECT *
+			FROM task_runtime_states
+			ORDER BY created_at
+		`)
+
+		return taskRows.map((taskRow): Task => {
+			const runtimeStates = runtimeStateRows
+				.filter((row) => row.task_id === taskRow.id)
+				.map((row): TaskRuntimeState => {
+					return {
+						change: row.change_type as StateChange,
+						happenedAt: new Date(row.created_at),
+					}
+				})
+
+			const lastStateChange = runtimeStates.at(-1)
+			const isRunning = lastStateChange?.change === 'resumed'
+
 			return {
-				id: row.id,
-				title: row.title,
+				id: taskRow.id,
+				createdAt: new Date(taskRow.created_at),
+				title: taskRow.title,
 				duration: {
-					hours: row.duration_hours,
-					minutes: row.duration_minutes,
-					seconds: row.duration_seconds,
+					hours: taskRow.duration_hours,
+					minutes: taskRow.duration_minutes,
+					seconds: taskRow.duration_seconds,
 				},
-				remainingTimeInSeconds: row.remaining_time_in_seconds,
-				isRunning: row.is_running !== 0,
-				createdAt: new Date(row.created_at),
+				isRunning,
+				runtimeStates,
 			}
 		})
 	}
 
-	private async createTable() {
+	private async getDb(): Promise<SQLite.SQLiteDatabase> {
+		if (!!this.db) return this.db
+
+		this.db = await SQLite.openDatabaseAsync(this.sqliteFilename)
+
 		await this.db.execAsync(`
-      CREATE TABLE IF NOT EXISTS tasks (
+			PRAGMA foreign_keys = ON;
+
+			CREATE TABLE IF NOT EXISTS tasks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
         duration_hours INTEGER NOT NULL,
         duration_minutes INTEGER NOT NULL,
         duration_seconds INTEGER NOT NULL,
-        remaining_time_in_seconds INTEGER NOT NULL DEFAULT 0,
-        is_running INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL
       );
+
+			CREATE TABLE IF NOT EXISTS task_runtime_states (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        task_id INTEGER,
+        change_type TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+				FOREIGN KEY (task_id) REFERENCES tasks(id)
+					ON UPDATE CASCADE
+					ON DELETE CASCADE
+      );
     `)
+
+		return this.db
 	}
 }
