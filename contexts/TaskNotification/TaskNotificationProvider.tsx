@@ -77,8 +77,8 @@ export function TaskNotificationProvider({ children }: PropsWithChildren) {
 				interruptionLevel: 'timeSensitive',
 			},
 			trigger: {
-				type: SchedulableTriggerInputTypes.TIME_INTERVAL,
-				seconds: getRemainingTimeInSeconds(task),
+				type: SchedulableTriggerInputTypes.DATE,
+				date: new Date(Date.now() + getRemainingTimeInSeconds(task) * 1000),
 				channelId: 'alarms',
 			},
 		}
