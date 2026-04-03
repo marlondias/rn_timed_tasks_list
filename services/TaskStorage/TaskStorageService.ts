@@ -32,21 +32,21 @@ class TaskStorageService {
 		const isRunningChanged =
 			changes.isRunning !== undefined && changes.isRunning !== oldTask.isRunning
 
-		if (durationChanged) {
-			await this.database.deleteTaskRuntimeStates(oldTask.id)
+		try {
+			if (durationChanged) {
+				await this.database.deleteTaskRuntimeStates(oldTask.id)
+			}
+			if (isRunningChanged && !durationChanged) {
+				await this.database.insertTaskRuntimeState(oldTask.id, {
+					change: changes.isRunning ? 'resumed' : 'paused',
+					happenedAt: new Date(),
+				})
+			}
+			await this.database.updateTask(oldTask.id, changes)
+			await this.triggerMutation()
+		} catch (error) {
+			this.logError('Failed to modify a task.', error)
 		}
-
-		if (isRunningChanged && !durationChanged) {
-			this.database.insertTaskRuntimeState(oldTask.id, {
-				change: changes.isRunning ? 'resumed' : 'paused',
-				happenedAt: new Date(),
-			})
-		}
-
-		await this.database
-			.updateTask(oldTask.id, changes)
-			.then(() => this.triggerMutation())
-			.catch((error) => this.logError('Failed to modify a task.', error))
 	}
 
 	public async remove(taskId: number): Promise<void> {
