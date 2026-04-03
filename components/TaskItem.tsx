@@ -46,14 +46,12 @@ export function TaskItem({ task }: Props) {
 				isCompleted={!task.isRunning && remainingTimeInSeconds === 0}
 				onPressPlay={() => {
 					taskStorageService.modify(task.id, { isRunning: true }).then(() => {
-						console.log('modificou para PLAY')
-						// scheduleTaskAlarmNotification(task),
+						scheduleAlarmNotification(task.id)
 					})
 				}}
 				onPressPause={() => {
 					taskStorageService.modify(task.id, { isRunning: false }).then(() => {
-						console.log('modificou para PAUSE')
-						// cancelTaskAlarmNotification(task),
+						cancelAlarmNotification(task.id)
 					})
 				}}
 				onPressRestart={() => {

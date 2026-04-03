@@ -13,16 +13,16 @@ export default function RootLayout() {
 
 	return (
 		<SecondsTickerProvider>
-			<TaskNotificationProvider>
-				<TaskStorageProvider>
+			<TaskStorageProvider>
+				<TaskNotificationProvider>
 					<SafeAreaProvider>
 						<ThemeProvider value={isDarkMode ? DarkTheme : LightTheme}>
 							<StatusBar style="auto" />
 							<Stack screenOptions={{ title: 'MultiTasker' }} />
 						</ThemeProvider>
 					</SafeAreaProvider>
-				</TaskStorageProvider>
-			</TaskNotificationProvider>
+				</TaskNotificationProvider>
+			</TaskStorageProvider>
 		</SecondsTickerProvider>
 	)
 }
