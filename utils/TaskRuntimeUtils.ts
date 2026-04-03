@@ -2,6 +2,8 @@ import { Task } from '@/types/Task'
 import { TaskRuntimeState } from '@/types/TaskRuntimeState'
 import { convertDurationToSeconds } from './TimeUtils'
 
+const SECOND_IN_MILLIS = 1000
+
 function getConsolidatedElapsedTimeInMillis(
 	sortedRuntimeStates: TaskRuntimeState[]
 ): number {
@@ -46,12 +48,16 @@ export function getElapsedTimeInSeconds(task: Task): number {
 		getConsolidatedElapsedTimeInMillis(sortedRuntimeStates) +
 		getCurrentElapsedTimeInMillis(sortedRuntimeStates, new Date())
 
-	return Math.floor(elapsedTimeInMilliseconds / 1000)
+	return Math.floor(elapsedTimeInMilliseconds / SECOND_IN_MILLIS)
 }
 
 export function getRemainingTimeInSeconds(task: Task): number {
-	return (
-		Math.max(convertDurationToSeconds(task.duration)) -
-		Math.max(0, getElapsedTimeInSeconds(task))
-	)
+	const totalSeconds = Math.max(0, convertDurationToSeconds(task.duration))
+	const elapsedSeconds = Math.max(0, getElapsedTimeInSeconds(task))
+
+	if (elapsedSeconds < 1) {
+		return totalSeconds
+	}
+
+	return elapsedSeconds < totalSeconds ? totalSeconds - elapsedSeconds : 0
 }
