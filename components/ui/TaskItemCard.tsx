@@ -76,6 +76,7 @@ const styles = StyleSheet.create({
 		width: '100%',
 		borderRadius: 10,
 		overflow: 'hidden',
+		marginVertical: 8,
 	},
 	containerLightMode: {
 		backgroundColor: 'rgb(199, 174, 62)',
