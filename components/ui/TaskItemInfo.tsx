@@ -1,5 +1,6 @@
 import { TimerDuration } from '@/types/TimerDuration'
 import { convertSecondsToDuration } from '@/utils/TimeUtils'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, useColorScheme, View } from 'react-native'
 
 type Props = {
@@ -27,6 +28,7 @@ const getEstimatedTimeTextFromDuration = (duration: TimerDuration): string => {
 }
 
 export function TaskItemInfo({ title, duration, remainingTimeInSeconds }: Props) {
+	const { t } = useTranslation()
 	const isDarkMode = useColorScheme() === 'dark'
 
 	return (
@@ -45,7 +47,7 @@ export function TaskItemInfo({ title, duration, remainingTimeInSeconds }: Props)
 					...(isDarkMode ? styles.textColorDarkMode : styles.textColorLightMode),
 				}}
 			>
-				Duration: {getEstimatedTimeTextFromDuration(duration)}
+				{t('TASK_INFO_LABEL_DURATION')}: {getEstimatedTimeTextFromDuration(duration)}
 			</Text>
 			<Text
 				style={{
@@ -53,7 +55,7 @@ export function TaskItemInfo({ title, duration, remainingTimeInSeconds }: Props)
 					...(isDarkMode ? styles.textColorDarkMode : styles.textColorLightMode),
 				}}
 			>
-				Remaining: {getEstimatedTimeText(remainingTimeInSeconds)}
+				{t('TASK_INFO_LABEL_REMAINING')}: {getEstimatedTimeText(remainingTimeInSeconds)}
 			</Text>
 		</View>
 	)

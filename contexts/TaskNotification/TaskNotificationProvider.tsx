@@ -14,6 +14,7 @@ import {
 	setNotificationHandler,
 } from 'expo-notifications'
 import { PropsWithChildren, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Alert } from 'react-native'
 
 setNotificationHandler({
@@ -26,6 +27,7 @@ setNotificationHandler({
 })
 
 export function TaskNotificationProvider({ children }: PropsWithChildren) {
+	const { t } = useTranslation()
 	const { taskStorageService } = useTaskStorage()
 
 	const requestPermissions = async (): Promise<void> => {
@@ -72,8 +74,8 @@ export function TaskNotificationProvider({ children }: PropsWithChildren) {
 		return {
 			identifier: getIdentifierFromTask(task.id),
 			content: {
-				title: 'Task Alarm',
-				body: `Your task "${task.title}" is done!`,
+				title: t('TASK_NOTIFICATION_TITLE'),
+				body: t('TASK_NOTIFICATION_CONTENT', { taskTitle: task.title }),
 				interruptionLevel: 'timeSensitive',
 			},
 			trigger: {

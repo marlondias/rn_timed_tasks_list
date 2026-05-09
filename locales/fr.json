@@ -1,0 +1,21 @@
+{
+	"TASK_INFO_LABEL_DURATION": "Durée",
+	"TASK_INFO_LABEL_REMAINING": "Restant",
+	"TASK_TITLE_INPUT_PLACEHOLDER": "tapez le titre de la tâche",
+
+	"TASK_OPTIONS_MENU_TITLE": "Options de tâche",
+	"TASK_OPTIONS_MENU_EDIT_LABEL": "Modifier",
+	"TASK_OPTIONS_MENU_DUPLICATE_LABEL": "Dupliquer",
+	"TASK_OPTIONS_MENU_DELETE_LABEL": "Supprimer",
+
+	"CREATE_TASK_MODAL_TITLE": "Créer une tâche",
+	"CREATE_TASK_MODAL_BUTTON_CONFIRM": "Créer",
+	"CREATE_TASK_MODAL_BUTTON_CANCEL": "Annuler",
+
+	"EDIT_TASK_MODAL_TITLE": "Modifier une tâche",
+	"EDIT_TASK_MODAL_BUTTON_CONFIRM": "Modifier",
+	"EDIT_TASK_MODAL_BUTTON_CANCEL": "Annuler",
+
+	"TASK_NOTIFICATION_TITLE": "Alarme de tâche",
+	"TASK_NOTIFICATION_CONTENT": "Le minuteur de votre tâche \"{{taskTitle}}\" est terminé!"
+}
