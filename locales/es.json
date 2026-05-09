@@ -14,5 +14,8 @@
 
 	"EDIT_TASK_MODAL_TITLE": "Editar una tarea",
 	"EDIT_TASK_MODAL_BUTTON_CONFIRM": "Editar",
-	"EDIT_TASK_MODAL_BUTTON_CANCEL": "Cancelar"
+	"EDIT_TASK_MODAL_BUTTON_CANCEL": "Cancelar",
+
+	"TASK_NOTIFICATION_TITLE": "Alarma de tarea",
+	"TASK_NOTIFICATION_CONTENT": "¡El temporizador de tu tarea \"{{taskTitle}}\" se ha completado!"
 }

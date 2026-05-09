@@ -14,5 +14,8 @@
 
 	"EDIT_TASK_MODAL_TITLE": "Edit a task",
 	"EDIT_TASK_MODAL_BUTTON_CONFIRM": "Edit",
-	"EDIT_TASK_MODAL_BUTTON_CANCEL": "Cancel"
+	"EDIT_TASK_MODAL_BUTTON_CANCEL": "Cancel",
+
+	"TASK_NOTIFICATION_TITLE": "Task alarm",
+	"TASK_NOTIFICATION_CONTENT": "The timer for your task \"{{taskTitle}}\" is completed!"
 }
