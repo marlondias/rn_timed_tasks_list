@@ -2,9 +2,6 @@
 
 ## Funcionalidades e desejos
 
-- Botão de configurações no canto direito do header. Deve abrir tela própria.
-- Context para preferências de usuário, usando persistência SQLite.
-- Seletor de idioma (EN, ES, PT, FR)
 - Melhorar experiência no momento do alarme. Usar tela cheia ou ações na notificação.
 
 ## Problemas
