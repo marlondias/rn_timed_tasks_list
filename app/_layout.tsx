@@ -1,4 +1,5 @@
 import { DarkTheme, LightTheme } from '@/constants/NavigationThemes'
+import { I18NProvider } from '@/contexts/I18N/I18NProvider'
 import { SecondsTickerProvider } from '@/contexts/SecondsTicker/SecondsTickerProvider'
 import { TaskNotificationProvider } from '@/contexts/TaskNotification/TaskNotificationProvider'
 import { TaskStorageProvider } from '@/contexts/TaskStorage/TaskStorageProvider'
@@ -12,17 +13,19 @@ export default function RootLayout() {
 	const isDarkMode = useColorScheme() === 'dark'
 
 	return (
-		<SecondsTickerProvider>
-			<TaskStorageProvider>
-				<TaskNotificationProvider>
-					<SafeAreaProvider>
-						<ThemeProvider value={isDarkMode ? DarkTheme : LightTheme}>
-							<StatusBar style="auto" />
-							<Stack screenOptions={{ title: 'MultiTasker' }} />
-						</ThemeProvider>
-					</SafeAreaProvider>
-				</TaskNotificationProvider>
-			</TaskStorageProvider>
-		</SecondsTickerProvider>
+		<I18NProvider>
+			<SecondsTickerProvider>
+				<TaskStorageProvider>
+					<TaskNotificationProvider>
+						<SafeAreaProvider>
+							<ThemeProvider value={isDarkMode ? DarkTheme : LightTheme}>
+								<StatusBar style="auto" />
+								<Stack screenOptions={{ title: 'MultiTasker' }} />
+							</ThemeProvider>
+						</SafeAreaProvider>
+					</TaskNotificationProvider>
+				</TaskStorageProvider>
+			</SecondsTickerProvider>
+		</I18NProvider>
 	)
 }
