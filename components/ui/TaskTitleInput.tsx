@@ -1,6 +1,7 @@
 import { InputLimits } from '@/constants/InputLimits'
 import { useTheme } from '@react-navigation/native'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, TextInput, useColorScheme } from 'react-native'
 
 type Props = {
@@ -9,6 +10,7 @@ type Props = {
 }
 
 export function TaskTitleInput({ initialTitle, onChange }: Props) {
+	const { t } = useTranslation()
 	const isDarkMode = useColorScheme() === 'dark'
 	const { colors } = useTheme()
 	const [title, setTitle] = useState<string>(
@@ -17,7 +19,7 @@ export function TaskTitleInput({ initialTitle, onChange }: Props) {
 
 	return (
 		<TextInput
-			placeholder="type in the task's title"
+			placeholder={t('TASK_TITLE_INPUT_PLACEHOLDER')}
 			maxLength={InputLimits.TaskTitleMaxLength}
 			value={title}
 			onChangeText={(text) => {

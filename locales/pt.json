@@ -1,3 +1,18 @@
 {
-	"WELCOME": "Bem-vindo"
+	"TASK_INFO_LABEL_DURATION": "Duração",
+	"TASK_INFO_LABEL_REMAINING": "Restante",
+	"TASK_TITLE_INPUT_PLACEHOLDER": "digite o título da tarefa",
+
+	"TASK_OPTIONS_MENU_TITLE": "Opções da tarefa",
+	"TASK_OPTIONS_MENU_EDIT_LABEL": "Editar",
+	"TASK_OPTIONS_MENU_DUPLICATE_LABEL": "Duplicar",
+	"TASK_OPTIONS_MENU_DELETE_LABEL": "Excluir",
+
+	"CREATE_TASK_MODAL_TITLE": "Criar uma tarefa",
+	"CREATE_TASK_MODAL_BUTTON_CONFIRM": "Criar",
+	"CREATE_TASK_MODAL_BUTTON_CANCEL": "Cancelar",
+
+	"EDIT_TASK_MODAL_TITLE": "Editar uma tarefa",
+	"EDIT_TASK_MODAL_BUTTON_CONFIRM": "Editar",
+	"EDIT_TASK_MODAL_BUTTON_CANCEL": "Cancelar"
 }

@@ -4,6 +4,7 @@ import { TaskTitleInput } from '@/components/ui/TaskTitleInput'
 import { TimerDuration } from '@/types/TimerDuration'
 import { isDurationZero } from '@/utils/TimeUtils'
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 
 type Props = {
@@ -21,6 +22,7 @@ export function EditTaskModal({
 	setIsVisible,
 	onConfirmEditing,
 }: Props) {
+	const { t } = useTranslation()
 	const [title, setTitle] = useState<string>(initialTitle)
 	const [duration, setDuration] = useState<TimerDuration>(initialDuration)
 	const isValidForEditing: boolean = useMemo(
@@ -39,15 +41,15 @@ export function EditTaskModal({
 		<CustomModal
 			isVisible={isVisible}
 			setIsVisible={setIsVisible}
-			title="Edit a task"
+			title={t('EDIT_TASK_MODAL_TITLE')}
 			buttons={[
 				{
-					title: 'Cancel',
+					title: t('EDIT_TASK_MODAL_BUTTON_CANCEL'),
 					color: '#b84f4f',
 					onPress: () => setIsVisible(false),
 				},
 				{
-					title: 'Edit',
+					title: t('EDIT_TASK_MODAL_BUTTON_CONFIRM'),
 					color: '#47ad46',
 					onPress: () => {
 						if (!isValidForEditing) return

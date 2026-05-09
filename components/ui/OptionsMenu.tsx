@@ -1,6 +1,7 @@
 import { OptionsButton } from '@/components/ui/OptionsButton'
 import { MenuAction, MenuView } from '@react-native-menu/menu'
 import { useCallback, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useColorScheme } from 'react-native'
 
 type Props = {
@@ -24,30 +25,31 @@ export function OptionsMenu({
 	onPressDuplicate,
 	onPressRemove,
 }: Props) {
+	const { t } = useTranslation()
 	const isDarkMode = useColorScheme() === 'dark'
 
 	const menuActions: MenuAction[] = useMemo(() => {
 		return [
 			{
 				id: MENU_ID_FOR_EDIT,
-				title: 'Edit',
+				title: t('TASK_OPTIONS_MENU_EDIT_LABEL'),
 				attributes: {
 					disabled: !allowEdit,
 				},
 			},
 			{
 				id: MENU_ID_FOR_DUPLICATE,
-				title: 'Duplicate',
+				title: t('TASK_OPTIONS_MENU_DUPLICATE_LABEL'),
 			},
 			{
 				id: MENU_ID_FOR_REMOVE,
-				title: 'Remove',
+				title: t('TASK_OPTIONS_MENU_DELETE_LABEL'),
 				attributes: {
 					destructive: true,
 				},
 			},
 		]
-	}, [allowEdit])
+	}, [allowEdit, t])
 
 	const onAction = useCallback(
 		(actionId: string): void => {
@@ -68,7 +70,7 @@ export function OptionsMenu({
 
 	return (
 		<MenuView
-			title="Task options"
+			title={t('TASK_OPTIONS_MENU_TITLE')}
 			themeVariant={isDarkMode ? 'dark' : 'light'}
 			isAnchoredToRight={true}
 			actions={menuActions}

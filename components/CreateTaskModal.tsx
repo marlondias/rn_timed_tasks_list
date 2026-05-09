@@ -5,6 +5,7 @@ import { useTaskStorage } from '@/contexts/TaskStorage/TaskStorageContext'
 import { getZeroDuration, TimerDuration } from '@/types/TimerDuration'
 import { isDurationZero } from '@/utils/TimeUtils'
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { View } from 'react-native'
 
 type Props = {
@@ -13,6 +14,7 @@ type Props = {
 }
 
 export function CreateTaskModal({ isVisible, setIsVisible }: Props) {
+	const { t } = useTranslation()
 	const { taskStorageService } = useTaskStorage()
 	const [title, setTitle] = useState<string>('')
 	const [duration, setDuration] = useState<TimerDuration>(getZeroDuration())
@@ -31,15 +33,15 @@ export function CreateTaskModal({ isVisible, setIsVisible }: Props) {
 		<CustomModal
 			isVisible={isVisible}
 			setIsVisible={setIsVisible}
-			title="Create a task"
+			title={t('CREATE_TASK_MODAL_TITLE')}
 			buttons={[
 				{
-					title: 'Cancel',
+					title: t('CREATE_TASK_MODAL_BUTTON_CANCEL'),
 					color: '#b84f4f',
 					onPress: () => setIsVisible(false),
 				},
 				{
-					title: 'Create',
+					title: t('CREATE_TASK_MODAL_BUTTON_CONFIRM'),
 					color: '#47ad46',
 					onPress: () => {
 						if (!isValidForCreation) return

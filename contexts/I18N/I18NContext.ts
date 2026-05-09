@@ -1,7 +1,5 @@
 import { createContext, useContext } from 'react'
 
-type I18NTextKeys = 'WELCOME'
-
 type I18NContextType = {
 	supportedLanguages: Set<string>
 	getCurrentLanguage: () => string
