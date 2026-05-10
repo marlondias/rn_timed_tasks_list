@@ -6,7 +6,7 @@
 
 ## Problemas
 
-- Melhorar o SecondsTicker, pode ter time drift.
+- None
 
 ## Obs
 
