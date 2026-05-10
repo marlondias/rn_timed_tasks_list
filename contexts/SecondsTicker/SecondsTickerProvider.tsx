@@ -3,29 +3,25 @@ import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { AppState, AppStateStatus } from 'react-native'
 
 export function SecondsTickerProvider({ children }: PropsWithChildren) {
-	// currentTick is epoch seconds (Math.floor(Date.now() / 1000))
-	// It reflects the actual time, so consumers get a reliable source of truth for remaining time calculations
 	const [currentTick, setCurrentTick] = useState<number>(() =>
 		Math.floor(Date.now() / 1000)
 	)
 	const [appState, setAppState] = useState<AppStateStatus>(AppState.currentState)
 	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-	// Listen to app state changes (background/foreground transitions)
 	useEffect(() => {
+		// Listen to app state changes (background/foreground transitions)
 		const subscription = AppState.addEventListener('change', setAppState)
 		return () => subscription.remove()
 	}, [])
 
 	// Schedule ticker updates aligned to second boundaries when app is active
 	useEffect(() => {
-		// Clear any existing timeout
-		if (timeoutRef.current) {
+		// Clear any previous timeout and only schedule if app is in foreground
+		if (timeoutRef.current !== null) {
 			clearTimeout(timeoutRef.current)
 			timeoutRef.current = null
 		}
-
-		// Only schedule if app is in foreground
 		if (appState !== 'active') return
 
 		// Function to schedule the next tick with alignment to the next second boundary
